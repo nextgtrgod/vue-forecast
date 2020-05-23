@@ -1,19 +1,20 @@
-# vue-forecast
+# [vue-forecast](https://nextgtrgod.github.io/vue-forecast/)
+### Weather forecast widget on vue.js
 
-## Project setup
-```
-yarn install
-```
+* [Vue.js](https://vuejs.org/)
+* [Google Places API](https://developers.google.com/places/)
+* [Open Weather Map API](https://openweathermap.org/api)
+* [Weather Icons](https://github.com/erikflowers/weather-icons)
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+![vue-forecast app screenshot](https://image.ibb.co/cUXBDG/react_forecast.jpg)
 
-### Compiles and minifies for production
-```
-yarn build
-```
+[DEMO](https://nextgtrgod.github.io/vue-forecast/)
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+
+### Todo
+- [ ] particles background
+- [ ] google places autocomplete on search
+- [ ] language autodetect
+- [ ] en/ru switch
+- [ ] °C/°F	switch
+- [ ] favicon temperature
