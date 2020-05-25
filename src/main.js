@@ -4,7 +4,10 @@ import store from './store'
 
 Vue.config.productionTip = false
 
+import i18n from '@/config/i18n'
+
 new Vue({
-    store,
-    render: function (h) { return h(App) }
+	store,
+	i18n,
+	render: function (h) { return h(App) }
 }).$mount('#app')

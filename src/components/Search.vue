@@ -34,7 +34,8 @@ input {
 	padding: 0 16px;
 	font-size: 24px;
 	font-weight: 700;
-	background-color: #FFF;
+	background-color: rgba(255, 255, 255, .5);
+	backdrop-filter: blur(4px);
 	border-top: 2px solid;
 	box-sizing: border-box;
 

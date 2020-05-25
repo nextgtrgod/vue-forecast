@@ -1,53 +1,55 @@
 <template>
 <main id="app">
+	<background/>
+
+	<div class="controls">
+		<ui-switch
+			:value="language === 'ru'"
+			@click.native="switchLanguage"
+		/>
+	</div>
+
 	<search/>
 	<widget/>
 
-	<ul>
+	<!-- <ul>
 		<forecast v-for="(item, i) in [1]" :key="i"/>
-	</ul>
+	</ul> -->
 </main>
 </template>
 
 
 <script>
+import { mapState } from 'vuex'
 import data from '@/mock/data'
 import API from '@/config'
 
-// let daily_forecast = (data.list || []).reduce((groups, item) => {
-
-// 	let date = new Date(item.dt * 1000)
-
-// 	let key = `${date.getUTCDate()}.${date.getUTCMonth()}.${date.getUTCFullYear()}`
-
-// 	;(groups[key] = groups[key] || []).push(item)
-
-// 	return groups
-// }, {})
-
-let daily_forecast = []
-
-daily_forecast.push(data.list[0])
-
-
+import Background from '@/components/Background'
 import Search from '@/components/Search'
 import Widget from '@/components/Widget'
 import Forecast from '@/components/Forecast'
+import uiSwitch from '@/components/Switch'
 
 export default {
 	name: 'App',
 	components: {
+		Background,
 		Search,
 		Widget,
 		Forecast,
+		uiSwitch,
 	},
 	data: () => ({
-
+		coords: {},
 	}),
-	created() {
-		this.$store.commit('set', daily_forecast)
+	async created() {
+		try {
+			this.coords = (await this.askLocation()).coords
+			this.getForecast()
 
-		this.askLocation().then(geo => console.log(geo))
+		} catch (error) {
+			console.log(error)
+		}
 	},
 	methods: {
 		askLocation() {
@@ -55,6 +57,28 @@ export default {
 				navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true })
 			))
 		},
+
+		async getForecast() {
+			try {
+				let data = await (await fetch(API.get(this.language, this.coords))).json()
+
+				this.$store.commit('set', data)
+
+			} catch (error) {
+				console.log(error)
+			}
+		},
+
+		switchLanguage() {
+			this.$store.commit('setLanguage', this.language === 'en' ? 'ru' : 'en')
+
+			this.getForecast()
+		},
+	},
+	computed: {
+		...mapState({
+			language: state => state.language,
+		})
 	},
 }
 </script>
@@ -71,6 +95,8 @@ body {
 }
 
 #app {
+	display: flex;
+	flex-direction: column;
 	width: 100%;
 	max-width: 500px;
 	margin: 100px auto;
@@ -83,7 +109,13 @@ body {
 ul {
 	display: flex;
 	justify-content: space-between;
-	margin: 0 -10px;
+	// margin: 0 -10px;
+}
+
+.controls {
+	margin-top: -72px;
+	margin-left: auto;
+	margin-bottom: 15px;
 }
 
 </style>
