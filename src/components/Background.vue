@@ -10,11 +10,10 @@ export default {
 	name: 'Background',
 	mounted() {
 		let sketch = new Sketch({
-			node: this.$el,
+			canvas: this.$el,
 			count: 20,
 			dpi: 2,
 		})
-		sketch.play()
 	},
 }
 </script>

@@ -8,7 +8,7 @@ import i18n from '@/config/i18n'
 let formatDate = t => {
 	let date = new Date(t)
 
-	return `${date.getUTCDate()}.${date.getUTCMonth()}.${date.getUTCFullYear()}`
+	return `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`
 }
 
 export default new Vuex.Store({

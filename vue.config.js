@@ -10,5 +10,15 @@ module.exports = {
 			.use('yaml')
 				.loader('yaml-loader')
 				.end()
+	},
+	configureWebpack: {
+		module: {
+			rules: [
+				{
+					test: /\.worker\.js$/,
+					use: { loader: 'worker-loader' }
+				}
+			]
+		}
 	}
 }
