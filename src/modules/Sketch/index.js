@@ -29,20 +29,28 @@ class Sketch {
 			},
 		}, [offscreen])
 
-		window.onresize = () => {
-			this.setSize()
-			this.createDots()
 
-			this.worker.postMessage({
-				type: 'resize',
-				data: this.dots,
-				options: {
-					W: this.W,
-					H: this.H,
-					threshold: this.threshold,
-				},
-			})
+		let resizeTimer = null
+
+		window.onresize = () => {
+			clearTimeout(resizeTimer)
+			resizeTimer = setTimeout(() => this.onResize(), 150)
 		}
+	}
+
+	onResize() {
+		this.setSize()
+		this.createDots()
+
+		this.worker.postMessage({
+			type: 'resize',
+			data: this.dots,
+			options: {
+				W: this.W,
+				H: this.H,
+				threshold: this.threshold,
+			},
+		})
 	}
 
 	setSize() {

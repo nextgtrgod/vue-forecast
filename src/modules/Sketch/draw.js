@@ -7,9 +7,8 @@ const PI = Math.PI
 
 let draw = (ctx, data = [], { W, H, threshold }) => {
 
-	ctx.clearRect(0, 0, W, H)
-
-	// console.log(dots)
+	ctx.fillStyle = '#F0F0F0'
+	ctx.fillRect(0, 0, W, H)
 
 	data.forEach((d, i, arr) => {
 
@@ -35,16 +34,11 @@ let draw = (ctx, data = [], { W, H, threshold }) => {
 				ctx.lineWidth = 2 * d.z + arr[j].z
 				ctx.stroke()
 			}
-
 		}
-
-		// draw circle
-		let color = 0
 
 		ctx.beginPath()
 		// ctx.fillStyle = `rgba(255, 255, 255, ${d.z})`
-		ctx.fillStyle = `rgba(${color}, ${color}, ${color}, 1)`
-		// ctx.fillStyle = '#1D1D1D'
+		ctx.fillStyle = '#000'
 		ctx.arc(d.x, d.y, d.r, 0, 2 * PI)
 		ctx.fill()
 	})

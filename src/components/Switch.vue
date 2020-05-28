@@ -1,5 +1,7 @@
 <template>
-<div class="ui-switch" :class="{ active: innerValue }" @click="toggle"/>
+<div class="ui-switch" :class="{ active: innerValue }" @click="toggle">
+	<audio src="../assets/audio/click.mp3" preload="auto" hidden ref="audio"/>
+</div>
 </template>
 
 
@@ -20,6 +22,9 @@ export default {
 	methods: {
 		toggle() {
 			this.innerValue = !this.innerValue
+
+			this.$refs['audio'].currentTime = 0
+			this.$refs['audio'].play()
 		}
 	},
 	watch: {
@@ -46,12 +51,11 @@ export default {
 	backdrop-filter: blur(4px);
 	border: 2px solid;
 	box-sizing: border-box;
-	transition: all .3s;
 	cursor: pointer;
 
 	&.active {
 		&:after {
-			transform: translateX(28px);
+			transform: translate3d(28px, 0, 0);
 		}
 	}
 
@@ -62,8 +66,7 @@ export default {
 		height: 32px;
 		background-color: currentColor;
 		border-radius: 50%;
-		transition: background-color .2s, transform .3s;
-		will-change: background-color, transform;
+		transition: transform .3s;
 	}
 }
 

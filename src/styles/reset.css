@@ -1,4 +1,14 @@
 
+html {
+	height: 100%;
+	overflow: hidden;
+}
+
+body {
+	height: 100%;
+	overflow: auto;
+}
+
 body {
 	margin: 0;
 	-webkit-overflow-scrolling: touch;

@@ -45,6 +45,7 @@ export default {
 	async created() {
 		try {
 			this.coords = (await this.askLocation()).coords
+
 			this.getForecast()
 
 		} catch (error) {

@@ -13,9 +13,10 @@ onmessage = e => {
 	self.canvas.width = options.W
 	self.canvas.height = options.H
 
-	let ctx = self.canvas.getContext('2d')
+	let ctx = self.canvas.getContext('2d', { alpha: false, desynchronized: true })
+	ctx.fillStyle = '#0f0'
 
-	cancelAnimationFrame(radId)
+	cancelAnimationFrame(self.radId)
 
 	self.rafId = update(ctx, data, options)
 }
