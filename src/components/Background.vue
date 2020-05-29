@@ -9,11 +9,8 @@ import Sketch from '@/modules/Sketch'
 export default {
 	name: 'Background',
 	mounted() {
-		let sketch = new Sketch({
-			canvas: this.$el,
-			count: 20,
-			dpi: 2,
-		})
+		if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+			this.sketch = new Sketch(this.$el)
 	},
 }
 </script>

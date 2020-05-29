@@ -66,7 +66,13 @@ export default {
 		height: 32px;
 		background-color: currentColor;
 		border-radius: 50%;
-		transition: transform .3s;
+		transition: transform .15s;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ui-switch::after {
+		transition: none;
 	}
 }
 

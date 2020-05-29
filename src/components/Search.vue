@@ -1,19 +1,47 @@
 <template>
-<form id="search">
-	<input type="text" v-model="query">
+<div id="search">
+	<input type="text" v-model="query" ref="input" @focus="focus">
 	<button aria-label="search">
 		<img src="../assets/images/search.svg" role="presentation">
 	</button>
-</form>
+</div>
 </template>
 
 
 <script>
+import API from '@/config'
+
 export default {
 	name: 'Search',
 	data: () => ({
-		query: 'Moscow, Russia',
+		query: 'Moscow',
 	}),
+	mounted() {
+		let script = document.createElement('script')
+
+		script.onload = this.init
+		script.src = API.autocomplete
+
+		document.body.appendChild(script)
+	},
+	methods: {
+		init() {
+			let autocomplete = new google.maps.places.Autocomplete(this.$refs['input'], { types: ['(cities)'] })
+
+			google.maps.event.addListener(autocomplete, 'place_changed', () => {
+				let place = autocomplete.getPlace()
+
+				let latitude = place.geometry.location.lat()
+				let longitude = place.geometry.location.lng()
+
+				this.$emit('search', { latitude, longitude })
+			})
+		},
+
+		focus() {
+			this.$refs['input'].select()
+		},
+	},
 }
 </script>
 
@@ -26,23 +54,45 @@ export default {
 	@media (min-width: 500px) {
 		margin-bottom: 15px;
 	}
+
+	&:after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border: 2px solid;
+		border-left: none;
+		border-right: none;
+		box-sizing: border-box;
+		pointer-events: none;
+
+		@media (min-width: 500px) {
+			border-radius: var(--radius);
+			border: 2px solid;
+		}
+	}
 }
 
 input {
 	width: 100%;
 	height: 50px;
-	padding: 0 16px;
+	padding: 0 10px;
 	font-size: 24px;
 	font-weight: 700;
 	background-color: rgba(255, 255, 255, .5);
 	backdrop-filter: blur(4px);
-	border-top: 2px solid;
 	box-sizing: border-box;
 
 	@media (min-width: 500px) {
+		padding: 0 16px;
 		border-radius: var(--radius);
-		border: 2px solid;
 	}
+}
+
+input::selection {
+	background-color: #FFCD01;
 }
 
 button {

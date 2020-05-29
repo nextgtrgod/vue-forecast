@@ -1,89 +1,94 @@
+const rnd = Math.random
 
-const random = Math.random
+// import getGpu from '@/utils/getGpu'
 
+import draw from './draw'
 import Worker from 'worker-loader!./worker'
 
 class Sketch {
-	constructor({ canvas, count = 20, dpi = window.devicePixelRatio }) {
-		if (!canvas) return console.log('no canvas provided')
-
+	constructor(canvas) {
 		this.canvas = canvas
-		this.dpi = dpi
-		this.count = count
+		this.dpi = window.devicePixelRatio
 
-		let offscreen = canvas.transferControlToOffscreen()
-		this.worker = new Worker()
+		// let gpu = getGpu()
+		// console.log(gpu)
 
-		this.setSize()
-		this.createDots()
-
-		this.worker.postMessage({
-			type: 'init',
-			canvas: offscreen,
-			data: this.dots,
-			options: {
-				W: this.W,
-				H: this.H,
-				count: count,
-				threshold: this.threshold,
-			},
-		}, [offscreen])
-
+		this.init()
 
 		let resizeTimer = null
 
 		window.onresize = () => {
 			clearTimeout(resizeTimer)
-			resizeTimer = setTimeout(() => this.onResize(), 150)
+			resizeTimer = setTimeout(() => this.init(), 150)
 		}
 	}
 
-	onResize() {
-		this.setSize()
-		this.createDots()
+	init() {
+		let W = window.innerWidth * this.dpi
+		let H = window.innerHeight * this.dpi
+		let count = ~~(window.innerWidth / (window.innerWidth < 720 ? 25 : 100))
+		let threshold = W / 1.5
+		let dots = this.createDots(count, W, H, this.dpi)
 
-		this.worker.postMessage({
-			type: 'resize',
-			data: this.dots,
-			options: {
-				W: this.W,
-				H: this.H,
-				threshold: this.threshold,
-			},
-		})
+		if (this.worker) {
+			this.worker.postMessage({
+				data: dots,
+				options: { W, H, threshold },
+			})
+			return
+		}
+
+		if ('transferControlToOffscreen' in this.canvas) {
+			this.worker = new Worker()
+			let offscreen = this.canvas.transferControlToOffscreen()
+
+			this.worker.postMessage({
+				canvas: offscreen,
+				data: dots,
+				options: { W, H, threshold },
+			}, [offscreen])
+
+		} else {
+			this.canvas.width = W
+			this.canvas.height = H
+
+			cancelAnimationFrame(this.radId)
+
+			let ctx = this.canvas.getContext('2d', { alpha: false })
+
+			this.update(ctx, dots, { W, H, threshold })
+		}
 	}
 
-	setSize() {
-		this.W = window.innerWidth * this.dpi
-		this.H = window.innerHeight * this.dpi
-
-		this.threshold = this.W / 3
-	}
-
-	createDots() {
+	createDots(count, W, H, dpi) {
 		let dots = []
-		dots.length = this.count
-
+		dots.length = count
+	
 		for (let i = 0; i < dots.length; i++) {
-
+	
 			dots[i] = {
-				x: random() * this.W,
-				y: random() * this.H / 2 + this.H / 4,
-				// y: random() * H,
-				z: random() * this.dpi,
+				x: rnd() * W,
+				y: rnd() * H / 2 + H / 4,
+				z: rnd() * dpi,
 				r: 10,
-				R: random() * this.W / 10, // movement circle radius
+				R: rnd() * W / 10, // movement circle radius
 				m: {
-					x: 2 * random() - 1, // movement direction
-					y: 2 * random() - 1,
+					x: 2 * rnd() - 1, // movement direction
+					y: 2 * rnd() - 1,
 				},
-				s: this.dpi * random() * 1,
+				s: dpi * rnd() * 1,
 			}
 	
 			dots[i].r = dots[i].r * dots[i].z + dots[i].r / 2
 		}
 	
-		this.dots = dots.sort((a, b) => a.z - b.z)
+		return dots.sort((a, b) => a.z - b.z)
+	}
+
+	update(...args) {
+		this.radId = requestAnimationFrame(() => this.update(...args))
+
+		draw(...args)
 	}
 }
 

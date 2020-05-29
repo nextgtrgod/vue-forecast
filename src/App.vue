@@ -1,20 +1,14 @@
 <template>
 <main id="app">
 	<background/>
-
 	<div class="controls">
 		<ui-switch
 			:value="language === 'ru'"
 			@click.native="switchLanguage"
 		/>
 	</div>
-
-	<search/>
+	<search @search="getForecast"/>
 	<widget/>
-
-	<!-- <ul>
-		<forecast v-for="(item, i) in [1]" :key="i"/>
-	</ul> -->
 </main>
 </template>
 
@@ -40,13 +34,12 @@ export default {
 		uiSwitch,
 	},
 	data: () => ({
-		coords: {},
+		coords: null,
 	}),
 	async created() {
 		try {
 			this.coords = (await this.askLocation()).coords
-
-			this.getForecast()
+			this.getForecast(this.coords)
 
 		} catch (error) {
 			console.log(error)
@@ -55,14 +48,14 @@ export default {
 	methods: {
 		askLocation() {
 			return new Promise((resolve, reject) => (
-				navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true })
+				navigator.geolocation
+					.getCurrentPosition(resolve, reject, { enableHighAccuracy: true })
 			))
 		},
 
-		async getForecast() {
+		async getForecast(coords) {
 			try {
-				let data = await (await fetch(API.get(this.language, this.coords))).json()
-
+				let data = await ( await fetch(API.forecast(this.language, coords)) ).json()
 				this.$store.commit('set', data)
 
 			} catch (error) {
@@ -73,7 +66,7 @@ export default {
 		switchLanguage() {
 			this.$store.commit('setLanguage', this.language === 'en' ? 'ru' : 'en')
 
-			this.getForecast()
+			this.getForecast(this.coords)
 		},
 	},
 	computed: {
@@ -88,6 +81,12 @@ export default {
 <style lang="scss">
 @import './styles/reset.css';
 @import './styles/fonts.css';
+
+@media (prefers-reduced-motion: reduce) {
+	* {
+		transition: none !important;
+	}
+}
 
 body {
 	display: flex;
@@ -117,6 +116,78 @@ ul {
 	margin-top: -72px;
 	margin-left: auto;
 	margin-bottom: 15px;
+}
+
+
+// google places autocomplete list
+.pac-container {
+	margin-top: 2px;
+	font-family: inherit;
+	background-color: #FFF;
+	border: 2px solid;
+	border-left: none;
+	border-right: none;
+	box-shadow: none;
+
+	@media (min-width: 500px) {
+		border: 2px solid;
+		border-radius: var(--radius);
+	}
+
+	&::after {
+		display: none;
+	}
+}
+
+.pac-item {
+	padding-left: 11px;
+	font-size: 24px;
+	line-height: 1.95em;
+	color: inherit;
+	transition: background-color .15s, border .1s;
+	border-top: 1px solid rgba(#000, .1);
+	cursor: pointer;
+
+	@media (min-width: 500px) {
+		padding-left: 14px;
+	}
+}
+
+.pac-item-selected {
+	border-top-color: #FFCD01 !important;
+	background-color: #FFCD01 !important;
+
+	&+.pac-item {
+		border-top-color: #FFCD01 !important;
+	}
+
+	.pac-item-query + span {
+		opacity: .75;
+	}
+}
+
+.pac-item:hover {
+	background-color: var(--color-bg);
+	border-top-color: var(--color-bg);
+
+	&+.pac-item {
+		border-top-color: var(--color-bg);
+	}
+}
+
+.pac-item-query {
+	font-size: inherit;
+	padding-right: .25em;
+}
+
+.pac-item-query + span {
+	font-size: .65em;
+	transition: opacity .1;
+	opacity: .5;
+}
+
+.pac-icon {
+	display: none;
 }
 
 </style>

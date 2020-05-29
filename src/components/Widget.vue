@@ -9,18 +9,23 @@ en:
 
 
 <template>
-<section id="widget" :class="{ visible: data }">
-	<template v-if="data">
+<section id="widget" :class="{ visible: today }">
+	<template v-if="today">
 		<div class="status">
 			<i :class="`wi wi-owm-${daytime}-${now.weather[0].id}`"/>
 			<h2>{{ description }}</h2>
 		</div>
 		<div class="temperature">
 			<h1>{{ temperature.current }}°</h1>
-			<p>{{ temperature.min }}..{{ temperature.max }}°</p>
+			<p>
+				{{ temperature.min !== temperature.max ? `${temperature.min}..${temperature.max}°` : null }}
+			</p>
 		</div>
 		<ul>
-			<li v-for="(item, i) in info" :key="i" :data-units="item.units">{{ item.value }}</li>
+			<li v-for="(item, i) in info" :key="i">
+				<i :class="item.icon"/>
+				<span :data-units="item.units">{{ item.value }}</span>
+			</li>
 		</ul>
 	</template>
 </section>
@@ -30,6 +35,8 @@ en:
 <script>
 import { mapState, mapGetters } from 'vuex'
 import makeFavicon from '@/utils/makeFavicon'
+
+let directions = ['up', 'up-right', 'right', 'down-right', 'down', 'down-left', 'left', 'up-left']
 
 export default {
 	name: 'Widget',
@@ -53,11 +60,11 @@ export default {
 		},
 
 		...mapGetters({
-			data: 'current',
+			today: 'current',
 		}),
 
 		now() {
-			return this.data[0]
+			return this.today[0]
 		},
 
 		description() {
@@ -69,10 +76,15 @@ export default {
 
 			makeFavicon(`${current}°`, 'bold 128px jura')
 
+			let { min, max } = this.today.reduce((range, forecast) => ({
+				min: [ ...range.min, forecast.main.temp_min ],
+				max: [ ...range.max, forecast.main.temp_max ],
+			}), { min: [], max: [] })
+
 			return {
-				current,
-				min: 0,
-				max: 0,
+				current: Math.round(this.now.main.temp),
+				min: Math.round(Math.min(...min)),
+				max: Math.round(Math.max(...max)),
 			}
 		},
 
@@ -81,18 +93,22 @@ export default {
 				humidity: {
 					value: this.now.main.humidity,
 					units: '%',
+					icon: 'wi wi-raindrop',
 				},
 				wind: {
-					value: this.now.wind.speed,
+					value: Math.round(this.now.wind.speed),
 					units: this.$t('speed'),
+					icon: `wi wi-direction-${directions[Math.round((this.now.wind.deg % 360) / 45)]}`,
 				},
 				pressure: {
 					value: Math.round(this.now.main.pressure / 1.33322368),
 					units: this.$t('pressure'),
+					icon: 'wi wi-thermometer',
 				},
 				cloudiness: {
 					value: this.now.clouds.all,
 					units: '%',
+					icon: 'wi wi-cloud'
 				},
 			}
 		},
@@ -104,17 +120,19 @@ export default {
 <style lang="scss" scoped>
 
 #widget {
-	display: flex;
-	align-items: center;
 	height: 210px;
 	padding: 15px 0;
-	font-size: 21px;
+	display: flex;
+	align-items: center;
+	font-size: 20px;
 	color: #FFF;
 	background-color: #000;
 	user-select: none;
 	box-sizing: border-box;
+	overflow: hidden;
 	opacity: 0;
 	transition: opacity .3s;
+	z-index: 1;
 
 	&.visible {
 		opacity: 1;
@@ -127,20 +145,22 @@ export default {
 }
 
 h1 {
-	margin-top: 35px;
-	font-size: 75px;
+	font-size: 80px;
 	line-height: 1;
+	letter-spacing: -0.05em;
 }
 
 h1 + p {
+	height: 1em;
 	margin-left: 5px;
+	margin-bottom: 1em;
 }
 
 h2 {
 	margin-top: auto;
 	max-width: calc(100% - 20px);
 	font-size: inherit;
-	line-height: 1;
+	line-height: .8;
 	text-align: right;
 }
 
@@ -158,35 +178,61 @@ h2 {
 	i {
 		margin-top: 25px;
 		font-size: 95px;
-
 	}
 }
 
 .temperature {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 	height: 100%;
 	padding-left: 10px;
 }
 
 ul {
-	display: inline-flex;
+	width: 100%;
+	max-width: 120px;
+	padding-right: 30px;
+	display: flex;
 	flex-direction: column;
 	margin-left: auto;
-	padding-right: 50px;
-	font-size: 21px;
+	font-size: 20px;
 
 	li {
-		margin-bottom: 8px;
+		display: flex;
+		align-items: center;
+		margin-bottom: .5em;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
 	}
 
-	li::after {
+	span {
+		line-height: 1;
+	}
+
+	span::after {
 		content: attr(data-units);
 		font-size: .6em;
 		margin-left: .5ch;
+		white-space: nowrap;
 	}
 
-	li[data-units="%"]::after {
+	span[data-units="%"]::after {
 		margin-left: 0;
 		font-size: .7em;
+	}
+
+	i[class*="direction"] {
+		transform: scale(1.625);
+	}
+
+	i {
+		flex-shrink: 0;
+		width: 1em;
+		margin-right: .35em;
+		text-align: center;
 	}
 }
 

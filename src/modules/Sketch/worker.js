@@ -5,10 +5,9 @@ self.radId = null
 self.canvas = null
 
 onmessage = e => {
+	let { canvas, data, options } = e.data
 
-	let { type, canvas, data, options } = e.data
-
-	if (type === 'init') self.canvas = canvas
+	if (canvas) self.canvas = canvas
 
 	self.canvas.width = options.W
 	self.canvas.height = options.H
