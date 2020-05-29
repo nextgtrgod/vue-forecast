@@ -30,8 +30,6 @@ export default new Vuex.Store({
 
 			state.city = data.city
 
-			document.title = state.city.name
-
 			state.forecast = (data.list || []).reduce((groups, item) => {
 
 				let key = formatDate(item.dt * 1000)

@@ -17,10 +17,14 @@ export default {
 		query: 'Moscow',
 	}),
 	mounted() {
+		// if (document.getElementById('google-places-api'))
+		// 	return this.init()
+
 		let script = document.createElement('script')
 
 		script.onload = this.init
 		script.src = API.autocomplete
+		// script.id = 'google-places-api'
 
 		document.body.appendChild(script)
 	},
@@ -35,6 +39,8 @@ export default {
 				let longitude = place.geometry.location.lng()
 
 				this.$emit('search', { latitude, longitude })
+
+				document.title = place.name
 			})
 		},
 
