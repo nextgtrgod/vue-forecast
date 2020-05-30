@@ -4,13 +4,18 @@
 
 
 <script>
+import { mapState } from 'vuex'
 import Sketch from '@/modules/Sketch'
 
 export default {
 	name: 'Background',
 	mounted() {
-		if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-			this.sketch = new Sketch(this.$el)
+		if (!this.reducedMotion) this.sketch = new Sketch(this.$el)
+	},
+	computed: {
+		...mapState({
+			reducedMotion: state => state.reducedMotion,
+		}),
 	},
 }
 </script>

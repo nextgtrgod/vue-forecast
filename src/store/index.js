@@ -4,17 +4,46 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 import i18n from '@/config/i18n'
+import formatDate from '@/utils/formatDate'
+import checkBrowser from '@/utils/checkBrowser'
 
-let formatDate = t => {
-	let date = new Date(t)
+const browser = checkBrowser()
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-	return `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`
+if (reducedMotion || browser !== 'chrome') {
+	let link = document.createElement('link')
+	link.rel = 'stylesheet'
+	link.href = 'weather-icons/weather-icons.css'
+	document.head.appendChild(link)
 }
+
+
+const settings = {
+	units: {
+		default: 'metric',
+		valid: ['metric', 'imperial'],
+	},
+	language: {
+		default: i18n.locale,
+		valid: ['en', 'ru'],
+	},
+}
+
+let units = localStorage.getItem('units')
+let language = localStorage.getItem('language')
 
 export default new Vuex.Store({
 	state: {
-		language: i18n.locale,
-		units: 'celsius', // farenheits
+		browser,
+		reducedMotion,
+
+		language: settings.language.valid.includes(language)
+			? language
+			: settings.language.default,
+
+		units: settings.units.valid.includes(units)
+			? units
+			: settings.units.default,
 
 		city: {},
 		forecast: {},
@@ -24,9 +53,15 @@ export default new Vuex.Store({
 			state.language = data
 			i18n.locale = state.language
 			document.documentElement.lang = state.language
+			localStorage.setItem('language', state.language)
+		},
+
+		setUnits: (state, data) => {
+			state.units = data
+			localStorage.setItem('units', state.units)
 		},
 		
-		set: (state, data) => {
+		setForecast: (state, data) => {
 
 			state.city = data.city
 

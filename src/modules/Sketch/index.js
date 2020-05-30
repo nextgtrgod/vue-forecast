@@ -1,4 +1,4 @@
-const rnd = Math.random
+import rnd from '@/utils/random'
 
 // import getGpu from '@/utils/getGpu'
 
@@ -26,9 +26,10 @@ class Sketch {
 	init() {
 		let W = window.innerWidth * this.dpi
 		let H = window.innerHeight * this.dpi
-		let count = ~~(window.innerWidth / (window.innerWidth < 720 ? 25 : 100))
-		let threshold = W / 1.5
-		let dots = this.createDots(count, W, H, this.dpi)
+		let count = ~~(window.innerWidth / (window.innerWidth < 720 ? 25 : 80))
+		let speed = 1.5
+		let threshold = W / 3
+		let dots = this.createDots(count, speed, W, H, this.dpi)
 
 		if (this.worker) {
 			this.worker.postMessage({
@@ -60,26 +61,26 @@ class Sketch {
 		}
 	}
 
-	createDots(count, W, H, dpi) {
+	createDots(count, speed, W, H, dpi) {
 		let dots = []
 		dots.length = count
 	
 		for (let i = 0; i < dots.length; i++) {
-	
+
 			dots[i] = {
-				x: rnd() * W,
-				y: rnd() * H / 2 + H / 4,
-				z: rnd() * dpi,
-				r: 10,
-				R: rnd() * W / 10, // movement circle radius
+				x: rnd.range(0, W),
+				y: rnd.range(H / 4, H / 2),
+				z: rnd.range(.5, 1.2) * dpi,
+				r: 12,
+				R: rnd.range(0, W / 10), // movement circle radius
 				m: {
-					x: 2 * rnd() - 1, // movement direction
-					y: 2 * rnd() - 1,
+					x: rnd.range(-1, 1), // movement direction
+					y: rnd.range(-1, 1),
 				},
-				s: dpi * rnd() * 1,
+				s: rnd.range(.5, speed) * dpi,
 			}
 	
-			dots[i].r = dots[i].r * dots[i].z + dots[i].r / 2
+			dots[i].r = dots[i].r * dots[i].z
 		}
 	
 		return dots.sort((a, b) => a.z - b.z)

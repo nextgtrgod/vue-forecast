@@ -5,43 +5,67 @@ const random = Math.random
 const abs = Math.abs
 const PI = Math.PI
 
-let draw = (ctx, data = [], { W, H, threshold }) => {
+let i = 0
+let j = 0
+let distance = 0
+
+let draw = (ctx, dots = [], { W, H, threshold }) => {
 
 	ctx.fillStyle = '#F0F0F0'
 	ctx.fillRect(0, 0, W, H)
 
-	data.forEach((d, i, arr) => {
+	for (i = 0; i < dots.length; i++) {
 
-		d.x += d.m.x * d.s
-		d.y += d.m.y * d.s
+		// move them
+		dots[i].x += dots[i].m.x * dots[i].s
+		dots[i].y += dots[i].m.y * dots[i].s
 
-		if (d.x - d.r < 0 || d.x + d.r > W) d.m.x = -d.m.x
-		if (d.y - d.r < 0 || d.y + d.r > H) d.m.y = -d.m.y
+		// check viewport edges
+		if (dots[i].x - dots[i].r < 0 || dots[i].x + dots[i].r > W) dots[i].m.x = -dots[i].m.x
+		if (dots[i].y - dots[i].r < 0 || dots[i].y + dots[i].r > H) dots[i].m.y = -dots[i].m.y
 
 		// draw lines between
-		for (let j = i; j < arr.length; j++) {
+		for (j = 0; j < dots.length; j++) {
 
-			let distance = getDistance(d.x, d.y, arr[j].x, arr[j].y)
+			if (j === i) continue
+
+			distance = getDistance(dots[i].x, dots[i].y, dots[j].x, dots[j].y)
+
+			if (distance < dots[i].r + dots[j].r) {
+				// dots[i].m.x *= -1
+				dots[i].m.x *= -1
+
+				// dots[j].m.x *= -1
+				dots[j].m.y *= -1
+
+				continue
+			}
 
 			if (distance < threshold) {
 				ctx.beginPath()
-				ctx.moveTo(d.x, d.y)
-				ctx.lineTo(arr[j].x, arr[j].y)
-				// ctx.strokeStyle = `rgba(255, 255, 255, ${(d.z + arr[j].z) / 2})`
+				ctx.moveTo(dots[i].x, dots[i].y)
+				ctx.lineTo(dots[j].x, dots[j].y)
+				// ctx.strokeStyle = `rgba(255, 255, 255, ${(d.z + dots[j].z) / 2})`
 
 				ctx.strokeStyle = `rgba(0, 0, 0, ${(threshold - distance) / 10})`
 
-				ctx.lineWidth = 2 * d.z + arr[j].z
+				ctx.lineWidth = Math.min((threshold / distance), Math.min(dots[i].r, dots[j].r))
 				ctx.stroke()
 			}
 		}
 
 		ctx.beginPath()
 		// ctx.fillStyle = `rgba(255, 255, 255, ${d.z})`
+		// if (Math.abs(dots[i].m.x) < 0.05) ctx.fillStyle = '#0F0'
+		// else if (Math.abs(dots[i].m.y) < 0.05) ctx.fillStyle = '#00F'
+		// else if (dots[i].s < .25) ctx.fillStyle = '#F00'
+		// else ctx.fillStyle = '#000'
+
 		ctx.fillStyle = '#000'
-		ctx.arc(d.x, d.y, d.r, 0, 2 * PI)
+
+		ctx.arc(dots[i].x, dots[i].y, dots[i].r, 0, 2 * PI)
 		ctx.fill()
-	})
+	}
 }
 
 export default draw

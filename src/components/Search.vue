@@ -1,6 +1,6 @@
 <template>
 <div id="search">
-	<input type="text" v-model="query" ref="input" @focus="focus">
+	<input type="text" v-model="query" ref="input">
 	<button aria-label="search">
 		<img src="../assets/images/search.svg" role="presentation">
 	</button>
@@ -14,7 +14,7 @@ import API from '@/config'
 export default {
 	name: 'Search',
 	data: () => ({
-		query: 'Moscow',
+		query: '',
 	}),
 	mounted() {
 		// if (document.getElementById('google-places-api'))
@@ -44,9 +44,9 @@ export default {
 			})
 		},
 
-		focus() {
-			this.$refs['input'].select()
-		},
+		// focus() {
+		// 	this.$refs['input'].select()
+		// },
 	},
 }
 </script>

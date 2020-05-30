@@ -1,9 +1,13 @@
 <i18n>
 ru:
- speed: "м/с"
+ speed:
+  metric: "м/с"
+  imperial: "mph"
  pressure: "мм. рт. ст."
 en:
- speed: "m/s"
+ speed:
+  metric: "m/s"
+  imperial: "mph"
  pressure: "mmHg"
 </i18n>
 
@@ -12,7 +16,7 @@ en:
 <section id="widget" :class="{ visible: today }">
 	<template v-if="today">
 		<div class="status">
-			<i :class="`wi wi-owm-${daytime}-${now.weather[0].id}`"/>
+			<icon :id="now.weather[0].id" :daytime="daytime"/>
 			<h2>{{ description }}</h2>
 		</div>
 		<div class="temperature">
@@ -23,7 +27,7 @@ en:
 		</div>
 		<ul>
 			<li v-for="(item, i) in info" :key="i">
-				<i :class="item.icon"/>
+				<img :src="item.icon" :style="item.style" alt="">
 				<span :data-units="item.units">{{ item.value }}</span>
 			</li>
 		</ul>
@@ -34,21 +38,19 @@ en:
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import makeFavicon from '@/utils/makeFavicon'
+import Icon from '@/components/Icon'
 
-let directions = ['up', 'up-right', 'right', 'down-right', 'down', 'down-left', 'left', 'up-left']
+import makeFavicon from '@/utils/makeFavicon'
 
 export default {
 	name: 'Widget',
-	data: () => ({
-		humidity: 72,
-		wind: 2,
-		pressure: 764,
-		cloudiness: 56,
-	}),
+	components: {
+		Icon,
+	},
 	computed: {
 		...mapState({
 			city: state => state.city,
+			units: state => state.units,
 		}),
 
 		daytime() {
@@ -93,22 +95,25 @@ export default {
 				humidity: {
 					value: this.now.main.humidity,
 					units: '%',
-					icon: 'wi wi-raindrop',
+					icon: require('@/assets/images/raindrop.svg'),
 				},
 				wind: {
 					value: Math.round(this.now.wind.speed),
-					units: this.$t('speed'),
-					icon: `wi wi-direction-${directions[Math.round((this.now.wind.deg % 360) / 45)]}`,
+					units: this.$t(`speed.${this.units}`),
+					icon: require('@/assets/images/arrow.svg'),
+					style: {
+						transform: `rotate(${Math.round((this.now.wind.deg % 360) / 45) * 45}deg)`,
+					},
 				},
 				pressure: {
 					value: Math.round(this.now.main.pressure / 1.33322368),
 					units: this.$t('pressure'),
-					icon: 'wi wi-thermometer',
+					icon: require('@/assets/images/thermometer.svg'),
 				},
 				cloudiness: {
 					value: this.now.clouds.all,
 					units: '%',
-					icon: 'wi wi-cloud'
+					icon: require('@/assets/images/cloud.svg'),
 				},
 			}
 		},
@@ -157,10 +162,14 @@ h1 + p {
 }
 
 h2 {
+	height: .8em;
+	margin-bottom: -2px;
+	padding: 0 10px;
+	display: flex;
+	align-items: flex-end;
 	margin-top: auto;
-	max-width: calc(100% - 20px);
 	font-size: inherit;
-	line-height: .8;
+	line-height: 1;
 	text-align: right;
 }
 
@@ -168,17 +177,12 @@ h2 {
 	width: 100%;
 	max-width: 190px;
 	height: 100%;
+	max-height: 100%;
 	display: flex;
 	flex-direction: column;
 	align-items: flex-end;
-	padding: 0 10px;
 	border-right: 1px dashed;
 	box-sizing: border-box;
-
-	i {
-		margin-top: 25px;
-		font-size: 95px;
-	}
 }
 
 .temperature {
@@ -192,11 +196,15 @@ h2 {
 ul {
 	width: 100%;
 	max-width: 120px;
-	padding-right: 30px;
+	padding-right: 10px;
 	display: flex;
 	flex-direction: column;
 	margin-left: auto;
 	font-size: 20px;
+
+	@media (min-width: 500px) {
+		padding-right: 30px;
+	}
 
 	li {
 		display: flex;
@@ -224,15 +232,20 @@ ul {
 		font-size: .7em;
 	}
 
-	i[class*="direction"] {
-		transform: scale(1.625);
-	}
-
-	i {
+	img {
 		flex-shrink: 0;
 		width: 1em;
+		height: 1em;
 		margin-right: .35em;
 		text-align: center;
+	}
+
+	img[src*='thermometer'] {
+		height: 1.2em;
+	}
+
+	img[src*='arrow'] {
+		height: .85em;
 	}
 }
 

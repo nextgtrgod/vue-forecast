@@ -3,8 +3,9 @@
 	<background/>
 	<div class="controls">
 		<ui-switch
-			:value="language === 'ru'"
-			@click.native="switchLanguage"
+			:value="units === 'metric'"
+			:labels="['C°', 'F°']"
+			@click.native="switchUnits"
 		/>
 	</div>
 	<search @search="getForecast"/>
@@ -38,7 +39,7 @@ export default {
 	}),
 	async created() {
 		try {
-			this.coords = (await this.askLocation()).coords
+			this.coords  = (await this.askLocation()).coords
 			this.getForecast(this.coords)
 
 		} catch (error) {
@@ -55,12 +56,19 @@ export default {
 
 		async getForecast(coords) {
 			try {
-				let data = await ( await fetch(API.forecast(this.language, coords)) ).json()
-				this.$store.commit('set', data)
+				let res = await fetch(API.forecast(coords, this.language, this.units))
+				let data = await res.json()
+				this.$store.commit('setForecast', data)
 
 			} catch (error) {
 				console.log(error)
 			}
+		},
+
+		switchUnits() {
+			this.$store.commit('setUnits', this.units === 'metric' ? 'imperial' : 'metric')
+
+			this.getForecast(this.coords)
 		},
 
 		switchLanguage() {
@@ -71,6 +79,7 @@ export default {
 	},
 	computed: {
 		...mapState({
+			units: state => state.units,
 			language: state => state.language,
 		})
 	},
@@ -101,7 +110,7 @@ body {
 	max-width: 500px;
 	margin: 100px auto;
 
-	@media (min-width: 560px) {
+	@media (min-width: 500px) {
 		margin: auto;
 	}
 }
@@ -116,6 +125,11 @@ ul {
 	margin-top: -72px;
 	margin-left: auto;
 	margin-bottom: 15px;
+	padding-right: 5px;
+
+	@media (min-width: 500px) {
+		padding-right: 0;
+	}
 }
 
 
