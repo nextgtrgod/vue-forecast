@@ -94,6 +94,7 @@ span {
 	font-weight: 700;
 	line-height: 1;
 	transition: transform .15s;
+	user-select: none;
 }
 
 span:first-of-type {

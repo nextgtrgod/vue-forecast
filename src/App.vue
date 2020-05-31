@@ -1,22 +1,30 @@
 <template>
 <main id="app">
 	<background/>
-	<div class="controls">
+
+	<div class="center">
 		<ui-switch
+			class="units"
 			:value="units === 'metric'"
 			:labels="['C°', 'F°']"
 			@click.native="switchUnits"
 		/>
+		<search @locate="locate"/>
+		<widget/>
 	</div>
-	<search @search="getForecast"/>
-	<widget/>
+
+	<ui-switch
+		class="language"
+		:value="language === 'en'"
+		:labels="['EN', 'RU']"
+		@click.native="switchLanguage"
+	/>
 </main>
 </template>
 
 
 <script>
 import { mapState } from 'vuex'
-import data from '@/mock/data'
 import API from '@/config'
 
 import Background from '@/components/Background'
@@ -34,24 +42,24 @@ export default {
 		Forecast,
 		uiSwitch,
 	},
-	data: () => ({
-		coords: null,
-	}),
-	async created() {
-		try {
-			this.coords  = (await this.askLocation()).coords
-			this.getForecast(this.coords)
-
-		} catch (error) {
-			console.log(error)
-		}
+	created() {
+		if (!this.coords) this.locate()
 	},
 	methods: {
-		askLocation() {
-			return new Promise((resolve, reject) => (
-				navigator.geolocation
-					.getCurrentPosition(resolve, reject, { enableHighAccuracy: true })
-			))
+		async locate(onError) {
+			try {
+				let { coords } = await new Promise((resolve, reject) => {
+					navigator.geolocation.getCurrentPosition(resolve, reject)
+				})
+
+				this.$store.commit('setCoords', {
+					latitude: coords.latitude,
+					longitude: coords.longitude,
+				})
+
+			} catch (error) {
+				if (onError) onError()
+			}
 		},
 
 		async getForecast(coords) {
@@ -79,9 +87,18 @@ export default {
 	},
 	computed: {
 		...mapState({
+			coords: state => state.coords,
 			units: state => state.units,
 			language: state => state.language,
-		})
+		}),
+	},
+	watch: {
+		coords: {
+			immediate: true,
+			handler(coords) {
+				if(coords) this.getForecast(coords)
+			},
+		},
 	},
 }
 </script>
@@ -98,12 +115,16 @@ export default {
 }
 
 body {
+	position: relative;
+}
+
+#app {
 	display: flex;
 	min-height: 100vh;
 	min-height: -webkit-fill-available;
 }
 
-#app {
+.center {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
@@ -115,13 +136,7 @@ body {
 	}
 }
 
-ul {
-	display: flex;
-	justify-content: space-between;
-	// margin: 0 -10px;
-}
-
-.controls {
+.units {
 	margin-top: -72px;
 	margin-left: auto;
 	margin-bottom: 15px;
@@ -129,6 +144,21 @@ ul {
 
 	@media (min-width: 500px) {
 		padding-right: 0;
+	}
+}
+
+.language {
+	position: absolute !important;
+	bottom: 10px;
+	right: 5px;
+
+	span {
+		font-size: 16px !important;
+	}
+
+	@media (min-width: 500px) {
+		bottom: 20px;
+		right: 20px;
 	}
 }
 

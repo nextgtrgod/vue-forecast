@@ -1,30 +1,29 @@
 <template>
 <div id="search">
 	<input type="text" v-model="query" ref="input">
-	<button aria-label="search">
-		<img src="../assets/images/search.svg" role="presentation">
+	<button aria-label="ask location" @click="locate" ref="button">
+		<img src="../assets/images/pin.svg" role="presentation">
 	</button>
 </div>
 </template>
 
 
 <script>
+import { mapState } from 'vuex'
 import API from '@/config'
 
 export default {
 	name: 'Search',
-	data: () => ({
-		query: '',
-	}),
+	data() {
+		return {
+			query: this.$store.state.coords.name,
+		}
+	},
 	mounted() {
-		// if (document.getElementById('google-places-api'))
-		// 	return this.init()
-
 		let script = document.createElement('script')
 
 		script.onload = this.init
-		script.src = API.autocomplete
-		// script.id = 'google-places-api'
+		script.src = API.autocomplete(this.language)
 
 		document.body.appendChild(script)
 	},
@@ -35,18 +34,31 @@ export default {
 			google.maps.event.addListener(autocomplete, 'place_changed', () => {
 				let place = autocomplete.getPlace()
 
+				if (!place.geometry) return
+
 				let latitude = place.geometry.location.lat()
 				let longitude = place.geometry.location.lng()
 
-				this.$emit('search', { latitude, longitude })
-
-				document.title = place.name
+				this.$store.commit('setCoords', {
+					latitude,
+					longitude,
+					name: place.name,
+					full_name: place.formatted_address, 
+				})
 			})
 		},
 
-		// focus() {
-		// 	this.$refs['input'].select()
-		// },
+		locate() {
+			this.$emit('locate', () => {
+				this.$refs['button'].classList.remove('error')
+				setTimeout(() => this.$refs['button'].classList.add('error'), 100)
+			})
+		},
+	},
+	computed: {
+		...mapState({
+			language: state => state.language,
+		}),
 	},
 }
 </script>
@@ -110,9 +122,36 @@ button {
 	height: 50px;
 
 	img {
-		width: 45%;
+		width: 32px;
 		margin: auto;
 	}
+
+	&.error {
+		animation: shake .4s;
+	}
 }
+
+@keyframes shake {
+    8%, 41% {
+        transform: translateX(-8%);
+    }
+
+    25%, 58% {
+        transform: translateX(8%);
+    }
+
+    75% {
+        transform: translateX(-4%);
+    }
+
+    92% {
+        transform: translateX(4%);
+    }
+
+    0%, 100% {
+        transform: translateX(0);
+    }
+}
+
 
 </style>

@@ -6,9 +6,10 @@ import draw from './draw'
 import Worker from 'worker-loader!./worker'
 
 class Sketch {
-	constructor(canvas) {
+	constructor(canvas, dpi = window.devicePixelRatio, speed = 1.5) {
 		this.canvas = canvas
-		this.dpi = window.devicePixelRatio
+		this.dpi = dpi
+		this.speed = speed
 
 		// let gpu = getGpu()
 		// console.log(gpu)
@@ -27,7 +28,7 @@ class Sketch {
 		let W = window.innerWidth * this.dpi
 		let H = window.innerHeight * this.dpi
 		let count = ~~(window.innerWidth / (window.innerWidth < 720 ? 25 : 80))
-		let speed = 1.5
+		let speed = this.speed
 		let threshold = W / 3
 		let dots = this.createDots(count, speed, W, H, this.dpi)
 
@@ -67,23 +68,21 @@ class Sketch {
 	
 		for (let i = 0; i < dots.length; i++) {
 
+			let s = rnd.range(.5, speed) * dpi
+			let angle = rnd.range(0, 2 * Math.PI)
+
 			dots[i] = {
 				x: rnd.range(0, W),
-				y: rnd.range(H / 4, H / 2),
-				z: rnd.range(.5, 1.2) * dpi,
-				r: 12,
-				R: rnd.range(0, W / 10), // movement circle radius
-				m: {
-					x: rnd.range(-1, 1), // movement direction
-					y: rnd.range(-1, 1),
+				y: rnd.range(0, H),
+				r: rnd.range(6, 15) * dpi,
+				s: {
+					x: s * Math.cos(angle),
+					y: s * Math.sin(angle),
 				},
-				s: rnd.range(.5, speed) * dpi,
 			}
-	
-			dots[i].r = dots[i].r * dots[i].z
 		}
-	
-		return dots.sort((a, b) => a.z - b.z)
+
+		return dots
 	}
 
 	update(...args) {

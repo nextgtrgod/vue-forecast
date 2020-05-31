@@ -29,13 +29,22 @@ const settings = {
 	},
 }
 
+let coords = JSON.parse(localStorage.getItem('coords'))
 let units = localStorage.getItem('units')
 let language = localStorage.getItem('language')
+
+if (coords && coords.full_name) {
+	document.title = coords.full_name
+}
+
+if (language) document.documentElement.lang = language
 
 export default new Vuex.Store({
 	state: {
 		browser,
 		reducedMotion,
+
+		coords,
 
 		language: settings.language.valid.includes(language)
 			? language
@@ -54,6 +63,12 @@ export default new Vuex.Store({
 			i18n.locale = state.language
 			document.documentElement.lang = state.language
 			localStorage.setItem('language', state.language)
+		},
+
+		setCoords: (state, data) => {
+			state.coords = data
+			localStorage.setItem('coords', JSON.stringify(state.coords))
+			state.coords.full_name = null
 		},
 
 		setUnits: (state, data) => {

@@ -52,6 +52,7 @@ export default {
 	display: flex;
 	align-items: center;
 	text-align: right;
+	backface-visibility: hidden;
 }
 
 i {

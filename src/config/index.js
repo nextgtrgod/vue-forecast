@@ -7,5 +7,7 @@ export default {
 		`&appid=${open_weather_api}` +
 		`&lat=${coords.latitude}&lon=${coords.longitude}`,
 	
-	autocomplete: `https://maps.googleapis.com/maps/api/js?&libraries=places&types=(cities)&key=${google_places_api}`
+	autocomplete: language => `https://maps.googleapis.com/maps/api/js?&libraries=places&types=(cities)` +
+		`&language=${language}` +
+		`&key=${google_places_api}`
 }

@@ -145,7 +145,6 @@ export default {
 
 	@media (min-width: 500px) {
 		border-radius: var(--radius);
-		margin-bottom: 15px;
 	}
 }
 
