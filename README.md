@@ -12,11 +12,11 @@
 
 
 ### Todo
-- [ ] google places autocomplete on search
+- [x] google places autocomplete on search
 - [ ] forecast chart
 - [x] language autodetect
 - [x] i18n
 - [x] en/ru switch
-- [ ] °C/°F	switch
+- [x] °C/°F	switch
 - [x] offscreen canvas (chrome)
 - [x] temperature value in favicon
