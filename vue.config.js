@@ -1,4 +1,10 @@
 module.exports = {
+	publicPath: process.env.NODE_ENV === 'production'
+		? '/vue-forecast/'
+		: '/',
+
+	productionSourceMap: false,
+
 	chainWebpack: config => {
 		config.module
 			.rule('i18n')
