@@ -1,7 +1,7 @@
 <template>
 <div id="search">
 	<input type="text" v-model="query" ref="input">
-	<button aria-label="ask location" @click="locate" ref="button">
+	<button aria-label="ask location" @click="locate" :disabled="loading" ref="button">
 		<img src="../assets/images/pin.svg" role="presentation">
 	</button>
 </div>
@@ -16,48 +16,94 @@ export default {
 	name: 'Search',
 	data() {
 		return {
-			query: this.$store.state.coords.name,
+			query: '',
+			loading: false,
 		}
 	},
 	mounted() {
-		let script = document.createElement('script')
-
-		script.onload = this.init
-		script.src = API.autocomplete(this.language)
-
-		document.body.appendChild(script)
+		this.init()
 	},
 	methods: {
 		init() {
-			let autocomplete = new google.maps.places.Autocomplete(this.$refs['input'], { types: ['(cities)'] })
+			return new Promise(resolve => {
+				let prev = document.getElementById('google-maps-api')
+				if (prev) {
+					document.body.removeChild(prev)
+					delete google.maps
+				}
+	
+				let script = document.createElement('script')
+				script.id = 'google-maps-api'
+	
+				script.onload = () => {
+					this.autocomplete = new google.maps.places.Autocomplete(this.$refs['input'], { types: ['(cities)'] })
+					this.geocoder = new google.maps.Geocoder()
 
-			google.maps.event.addListener(autocomplete, 'place_changed', () => {
-				let place = autocomplete.getPlace()
+					google.maps.event.addListener(this.autocomplete, 'place_changed', this.search)
 
-				if (!place.geometry) return
+					resolve()
+	
+					if (this.coords) this.getCity()
+				}
+				script.src = API.autocomplete(this.language)
+	
+				document.body.appendChild(script)
+			})
+		},
 
-				let latitude = place.geometry.location.lat()
-				let longitude = place.geometry.location.lng()
+		search() {
+			let place = this.autocomplete.getPlace()
 
-				this.$store.commit('setCoords', {
-					latitude,
-					longitude,
-					name: place.name,
-					full_name: place.formatted_address, 
-				})
+			if (!place.geometry) return
+
+			let latitude = place.geometry.location.lat()
+			let longitude = place.geometry.location.lng()
+
+			this.$store.commit('setCoords', {
+				latitude,
+				longitude,
+				name: place.formatted_address,
+			})
+		},
+
+		getCity() {
+			let options = {
+				location: new google.maps.LatLng(this.coords.latitude, this.coords.longitude)
+			}
+
+			this.geocoder.geocode(options, (results, status) => {
+				if (!status === 'OK') return
+
+				let city = results.find(r => r.types.includes('locality'))
+
+				if (!city) return
+
+				document.title = city.formatted_address
+				this.query = city.formatted_address
 			})
 		},
 
 		locate() {
-			this.$emit('locate', () => {
-				this.$refs['button'].classList.remove('error')
-				setTimeout(() => this.$refs['button'].classList.add('error'), 100)
-			})
+			this.loading = true
+
+			this.$emit(
+				'locate',
+				() => {
+					this.loading = false
+					this.getCity()
+				},
+				() => {
+					this.loading = false
+					this.$refs['button'].classList.remove('error')
+					setTimeout(() => this.$refs['button'].classList.add('error'), 100)
+				},
+			)
 		},
 	},
 	computed: {
 		...mapState({
 			language: state => state.language,
+			coords: state => state.coords,
 		}),
 	},
 }
@@ -68,6 +114,10 @@ export default {
 
 #search {
 	position: relative;
+	display: flex;
+	background-color: rgba(255, 255, 255, .5);
+	border-radius: var(--radius);
+	backdrop-filter: blur(4px);
 
 	@media (min-width: 500px) {
 		margin-bottom: 15px;
@@ -96,16 +146,14 @@ export default {
 input {
 	width: 100%;
 	height: 50px;
-	padding: 0 10px;
+	padding-left: 10px;
 	font-size: 24px;
 	font-weight: 700;
-	background-color: rgba(255, 255, 255, .5);
-	backdrop-filter: blur(4px);
+	text-overflow: ellipsis;
 	box-sizing: border-box;
 
 	@media (min-width: 500px) {
-		padding: 0 16px;
-		border-radius: var(--radius);
+		padding-left: 16px;
 	}
 }
 
@@ -114,20 +162,46 @@ input::selection {
 }
 
 button {
-	position: absolute;
-	top: 0;
-	right: 0;
-	display: flex;
+	position: relative;
 	width: 50px;
 	height: 50px;
+	transition: opacity .2s;
 
-	img {
-		width: 32px;
-		margin: auto;
+	&:disabled {
+		animation: bounce 1.5s linear infinite;
+		pointer-events: none;
 	}
 
 	&.error {
 		animation: shake .4s;
+	}
+
+	img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: auto;
+		width: 32px;
+	}
+}
+
+@keyframes bounce {
+	25% {
+		transform: translate3d(0, -2.5%, 0);
+	}
+
+	50% {
+		transform: translate3d(0, 0, 0);
+	}
+
+	75% {
+		transform: translate3d(0, 2.5%, 0);
+	}
+
+	100% {
+		transform: translate3d(0, 0, 0);
 	}
 }
 

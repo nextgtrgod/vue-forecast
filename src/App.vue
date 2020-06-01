@@ -9,7 +9,7 @@
 			:labels="['C°', 'F°']"
 			@click.native="switchUnits"
 		/>
-		<search @locate="locate"/>
+		<search @locate="locate" ref="search"/>
 		<widget/>
 	</div>
 
@@ -43,10 +43,12 @@ export default {
 		uiSwitch,
 	},
 	created() {
+		document.documentElement.lang = this.language
+
 		if (!this.coords) this.locate()
 	},
 	methods: {
-		async locate(onError) {
+		async locate(resolve, reject) {
 			try {
 				let { coords } = await new Promise((resolve, reject) => {
 					navigator.geolocation.getCurrentPosition(resolve, reject)
@@ -57,8 +59,10 @@ export default {
 					longitude: coords.longitude,
 				})
 
+				if (resolve) resolve()
+
 			} catch (error) {
-				if (onError) onError()
+				if (reject) reject()
 			}
 		},
 
@@ -79,24 +83,25 @@ export default {
 			this.getForecast(this.coords)
 		},
 
-		switchLanguage() {
+		async switchLanguage() {
 			this.$store.commit('setLanguage', this.language === 'en' ? 'ru' : 'en')
 
+			await this.$refs['search'].init()
 			this.getForecast(this.coords)
 		},
 	},
 	computed: {
 		...mapState({
+			language: state => state.language,
 			coords: state => state.coords,
 			units: state => state.units,
-			language: state => state.language,
 		}),
 	},
 	watch: {
 		coords: {
 			immediate: true,
 			handler(coords) {
-				if(coords) this.getForecast(coords)
+				if (coords) this.getForecast(coords)
 			},
 		},
 	},

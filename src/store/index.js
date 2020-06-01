@@ -17,27 +17,20 @@ if (reducedMotion || browser !== 'chrome') {
 	document.head.appendChild(link)
 }
 
-
-const settings = {
-	units: {
-		default: 'metric',
-		valid: ['metric', 'imperial'],
-	},
-	language: {
-		default: i18n.locale,
-		valid: ['en', 'ru'],
-	},
+let coords = null
+try {
+	let { latitude, longitude } = JSON.parse(localStorage.getItem('coords')) || {}
+	if (latitude && longitude) coords = { latitude, longitude }
+} catch (error) {
+	console.warn('Error reading localStorage:', error)
 }
 
-let coords = JSON.parse(localStorage.getItem('coords'))
-let units = localStorage.getItem('units')
 let language = localStorage.getItem('language')
+let units = localStorage.getItem('units')
 
-if (coords && coords.full_name) {
-	document.title = coords.full_name
-}
-
-if (language) document.documentElement.lang = language
+let validate = (value, accept = [], initial) => (
+	accept.includes(value) ? value : initial
+)
 
 export default new Vuex.Store({
 	state: {
@@ -46,13 +39,8 @@ export default new Vuex.Store({
 
 		coords,
 
-		language: settings.language.valid.includes(language)
-			? language
-			: settings.language.default,
-
-		units: settings.units.valid.includes(units)
-			? units
-			: settings.units.default,
+		language: validate(language, ['en', 'ru'], i18n.locale),
+		units: validate(units, ['metric', 'imperial'], 'metric'),
 
 		city: {},
 		forecast: {},
@@ -60,24 +48,32 @@ export default new Vuex.Store({
 	mutations: {
 		setLanguage: (state, data) => {
 			state.language = data
+
 			i18n.locale = state.language
+
 			document.documentElement.lang = state.language
+
 			localStorage.setItem('language', state.language)
 		},
 
 		setCoords: (state, data) => {
 			state.coords = data
-			localStorage.setItem('coords', JSON.stringify(state.coords))
-			state.coords.full_name = null
+
+			document.title = state.coords.name
+
+			localStorage.setItem('coords', JSON.stringify({
+				latitude: state.coords.latitude,
+				longitude: state.coords.longitude,
+			}))
 		},
 
 		setUnits: (state, data) => {
 			state.units = data
+
 			localStorage.setItem('units', state.units)
 		},
-		
-		setForecast: (state, data) => {
 
+		setForecast: (state, data) => {
 			state.city = data.city
 
 			state.forecast = (data.list || []).reduce((groups, item) => {

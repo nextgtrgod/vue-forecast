@@ -12,7 +12,7 @@ onmessage = e => {
 	self.canvas.width = options.W
 	self.canvas.height = options.H
 
-	let ctx = self.canvas.getContext('2d', { alpha: true, desynchronized: true })
+	let ctx = self.canvas.getContext('2d', { alpha: false, desynchronized: true })
 	ctx.fillStyle = '#0f0'
 
 	cancelAnimationFrame(self.radId)

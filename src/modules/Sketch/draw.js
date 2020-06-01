@@ -11,8 +11,8 @@ let distance = 0
 
 let draw = (ctx, dots = [], { W, H, threshold }) => {
 
-	// ctx.fillStyle = '#F0F0F0'
-	ctx.clearRect(0, 0, W, H)
+	ctx.fillStyle = '#F0F0F0'
+	ctx.fillRect(0, 0, W, H)
 
 	for (i = 0; i < dots.length; i++) {
 

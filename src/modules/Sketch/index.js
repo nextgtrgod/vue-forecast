@@ -5,6 +5,8 @@ import rnd from '@/utils/random'
 import draw from './draw'
 import Worker from 'worker-loader!./worker'
 
+let PI = Math.PI
+
 class Sketch {
 	constructor(canvas, dpi = window.devicePixelRatio, speed = 1.5) {
 		this.canvas = canvas
@@ -56,7 +58,7 @@ class Sketch {
 
 			cancelAnimationFrame(this.radId)
 
-			let ctx = this.canvas.getContext('2d', { alpha: false })
+			let ctx = this.canvas.getContext('2d', { alpha: false, desynchronized: true })
 
 			this.update(ctx, dots, { W, H, threshold })
 		}
@@ -69,7 +71,14 @@ class Sketch {
 		for (let i = 0; i < dots.length; i++) {
 
 			let s = rnd.range(.5, speed) * dpi
-			let angle = rnd.range(0, 2 * Math.PI)
+
+			let limit = PI/12
+			let angle = rnd.from([
+				rnd.range(limit, PI/2 - limit),
+				rnd.range(PI/2 + limit, PI - limit),
+				rnd.range(PI + limit, 1.5*PI - limit),
+				rnd.range(1.5*PI + limit, 2*PI - limit),
+			])
 
 			dots[i] = {
 				x: rnd.range(0, W),
