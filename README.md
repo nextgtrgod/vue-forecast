@@ -6,7 +6,7 @@
 * [Open Weather Map API](https://openweathermap.org/api)
 * [Weather Icons](https://github.com/erikflowers/weather-icons)
 
-![vue-forecast app screenshot](https://image.ibb.co/cUXBDG/react_forecast.jpg)
+![vue-forecast app screenshot](https://i.imgur.com/U51swln.jpg)
 
 [DEMO](https://nextgtrgod.github.io/vue-forecast/)
 
