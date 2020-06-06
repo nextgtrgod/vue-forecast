@@ -1,7 +1,15 @@
+<i18n>
+ru:
+ location: "Ваше расположение"
+en:
+ location: "Your location"
+</i18n>
+
+
 <template>
 <div id="search">
 	<input type="text" v-model="query" ref="input">
-	<button aria-label="ask location" @click="locate" :disabled="loading" ref="button">
+	<button @click="locate" :disabled="loading" :title="$t('location')" ref="button">
 		<img src="../assets/images/pin.svg" role="presentation">
 	</button>
 </div>
@@ -20,8 +28,9 @@ export default {
 			loading: false,
 		}
 	},
-	mounted() {
-		this.init()
+	async mounted() {
+		await this.init()
+		this.locate()
 	},
 	methods: {
 		init() {
@@ -31,7 +40,7 @@ export default {
 					document.body.removeChild(prev)
 					delete google.maps
 				}
-	
+
 				let script = document.createElement('script')
 				script.id = 'google-maps-api'
 	
@@ -51,19 +60,27 @@ export default {
 			})
 		},
 
-		search() {
-			let place = this.autocomplete.getPlace()
+		async locate(resolve, reject) {
+			this.loading = true
 
-			if (!place.geometry) return
+			try {
+				let { coords } = await new Promise((resolve, reject) => {
+					navigator.geolocation.getCurrentPosition(resolve, reject)
+				})
 
-			let latitude = place.geometry.location.lat()
-			let longitude = place.geometry.location.lng()
+				this.$store.commit('setCoords', {
+					latitude: coords.latitude,
+					longitude: coords.longitude,
+				})
 
-			this.$store.commit('setCoords', {
-				latitude,
-				longitude,
-				name: place.formatted_address,
-			})
+				this.getCity()
+
+			} catch (error) {
+				this.$refs['button'].classList.remove('error')
+				setTimeout(() => this.$refs['button'].classList.add('error'), 100)
+			}
+
+			this.loading = false
 		},
 
 		getCity() {
@@ -83,27 +100,25 @@ export default {
 			})
 		},
 
-		locate() {
-			this.loading = true
+		search() {
+			let place = this.autocomplete.getPlace()
 
-			this.$emit(
-				'locate',
-				() => {
-					this.loading = false
-					this.getCity()
-				},
-				() => {
-					this.loading = false
-					this.$refs['button'].classList.remove('error')
-					setTimeout(() => this.$refs['button'].classList.add('error'), 100)
-				},
-			)
+			if (!place.geometry) return
+
+			let latitude = place.geometry.location.lat()
+			let longitude = place.geometry.location.lng()
+
+			this.$store.commit('setCoords', {
+				latitude,
+				longitude,
+				name: place.formatted_address,
+			})
 		},
 	},
 	computed: {
 		...mapState({
-			language: state => state.language,
 			coords: state => state.coords,
+			language: state => state.language,
 		}),
 	},
 }
@@ -121,6 +136,7 @@ export default {
 
 	@media (min-width: 500px) {
 		margin-bottom: 15px;
+		padding-right: 2px;
 	}
 
 	&:after {
@@ -165,10 +181,17 @@ button {
 	position: relative;
 	width: 50px;
 	height: 50px;
-	transition: opacity .2s;
+	user-select: none;
+	animation-name: zoom;
+	animation-duration: .75s;
+	animation-timing-function: ease-in-out;
+	animation-direction: alternate;
+	animation-iteration-count: infinite;
+	animation-play-state: paused;
+	transition: transform .2s;
 
 	&:disabled {
-		animation: bounce 1.5s linear infinite;
+		animation-play-state: running;
 		pointer-events: none;
 	}
 
@@ -187,21 +210,9 @@ button {
 	}
 }
 
-@keyframes bounce {
-	25% {
-		transform: translate3d(0, -2.5%, 0);
-	}
-
-	50% {
-		transform: translate3d(0, 0, 0);
-	}
-
-	75% {
-		transform: translate3d(0, 2.5%, 0);
-	}
-
-	100% {
-		transform: translate3d(0, 0, 0);
+@keyframes zoom {
+	to {
+		transform: scale(1.15);
 	}
 }
 

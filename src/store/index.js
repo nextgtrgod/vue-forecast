@@ -25,12 +25,9 @@ try {
 	console.warn('Error reading localStorage:', error)
 }
 
-let language = localStorage.getItem('language')
-let units = localStorage.getItem('units')
-
-let validate = (value, accept = [], initial) => (
-	accept.includes(value) ? value : initial
-)
+let units = ['metric', 'imperial'].find(type => (
+	type === localStorage.getItem('units')
+)) || 'metric'
 
 export default new Vuex.Store({
 	state: {
@@ -38,9 +35,8 @@ export default new Vuex.Store({
 		reducedMotion,
 
 		coords,
-
-		language: validate(language, ['en', 'ru'], i18n.locale),
-		units: validate(units, ['metric', 'imperial'], 'metric'),
+		language: i18n.locale,
+		units,
 
 		city: {},
 		forecast: {},

@@ -1,5 +1,5 @@
 <template>
-<button class="ui-switch" :class="{ active: innerValue }" @click="toggle">
+<button class="ui-switch" :class="{ active: innerValue }" @click="toggle" :title="title">
 	<span>{{ labels[0] }}</span>
 	<span>{{ labels[1] }}</span>
 	<audio src="../assets/audio/click.mp3" preload="auto" hidden ref="audio"/>
@@ -18,6 +18,9 @@ export default {
 		labels: {
 			type: Array,
 			default: () => [],
+		},
+		title: {
+			type: String,
 		},
 	},
 	data() {

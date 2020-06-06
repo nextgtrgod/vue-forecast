@@ -1,3 +1,13 @@
+<i18n>
+ru:
+ language: "Предпочитаемый язык"
+ units: "Единицы измерения температуры"
+en:
+ language: "Preferred language"
+ units: "Temperature units"
+</i18n>
+
+
 <template>
 <main id="app">
 	<background/>
@@ -8,8 +18,9 @@
 			:value="units === 'metric'"
 			:labels="['C°', 'F°']"
 			@click.native="switchUnits"
+			:title="$t('units')"
 		/>
-		<search @locate="locate" ref="search"/>
+		<search ref="search"/>
 		<widget/>
 	</div>
 
@@ -18,6 +29,7 @@
 		:value="language === 'en'"
 		:labels="['EN', 'RU']"
 		@click.native="switchLanguage"
+		:title="$t('language')"
 	/>
 </main>
 </template>
@@ -42,30 +54,7 @@ export default {
 		Forecast,
 		uiSwitch,
 	},
-	created() {
-		document.documentElement.lang = this.language
-
-		if (!this.coords) this.locate()
-	},
 	methods: {
-		async locate(resolve, reject) {
-			try {
-				let { coords } = await new Promise((resolve, reject) => {
-					navigator.geolocation.getCurrentPosition(resolve, reject)
-				})
-
-				this.$store.commit('setCoords', {
-					latitude: coords.latitude,
-					longitude: coords.longitude,
-				})
-
-				if (resolve) resolve()
-
-			} catch (error) {
-				if (reject) reject()
-			}
-		},
-
 		async getForecast(coords) {
 			try {
 				let res = await fetch(API.forecast(coords, this.language, this.units))

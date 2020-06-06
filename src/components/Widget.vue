@@ -1,14 +1,26 @@
 <i18n>
 ru:
- speed:
-  metric: "м/с"
-  imperial: "mph"
- pressure: "мм. рт. ст."
+ humidity: "Влажность"
+ wind:
+  title: "Направление и скорость ветра"
+  units:
+   metric: "м/с"
+   imperial: "mph"
+ pressure:
+  title: "Давление"
+  units: "мм. рт. ст."
+ cloudiness: "Облачность"
 en:
- speed:
-  metric: "m/s"
-  imperial: "mph"
- pressure: "mmHg"
+ humidity: "Humidity"
+ wind:
+  title: "Wind direction and speed"
+  units:
+   metric: "m/s"
+   imperial: "mph"
+ pressure:
+  title: "Pressure"
+  units: "mmHg"
+ cloudiness: "Cloudiness"
 </i18n>
 
 
@@ -26,7 +38,7 @@ en:
 			</p>
 		</div>
 		<ul>
-			<li v-for="(item, i) in info" :key="i">
+			<li v-for="(item, i) in info" :key="i" :title="item.title">
 				<img :src="item.icon" :style="item.style" alt="">
 				<span :data-units="item.units">{{ item.value }}</span>
 			</li>
@@ -96,24 +108,28 @@ export default {
 					value: this.now.main.humidity,
 					units: '%',
 					icon: require('@/assets/images/raindrop.svg'),
+					title: this.$t('humidity'),
 				},
 				wind: {
 					value: Math.round(this.now.wind.speed),
-					units: this.$t(`speed.${this.units}`),
+					units: this.$t(`wind.units.${this.units}`),
 					icon: require('@/assets/images/arrow.svg'),
 					style: {
 						transform: `rotate(${Math.round((this.now.wind.deg % 360) / 45) * 45}deg)`,
 					},
+					title: this.$t('wind.title'),
 				},
 				pressure: {
 					value: Math.round(this.now.main.pressure / 1.33322368),
-					units: this.$t('pressure'),
+					units: this.$t('pressure.units'),
 					icon: require('@/assets/images/thermometer.svg'),
+					title: this.$t('pressure.title'),
 				},
 				cloudiness: {
 					value: this.now.clouds.all,
 					units: '%',
 					icon: require('@/assets/images/cloud.svg'),
+					title: this.$t('cloudiness'),
 				},
 			}
 		},
