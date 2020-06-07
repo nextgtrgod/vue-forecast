@@ -42,8 +42,8 @@ import API from '@/config'
 import Background from '@/components/Background'
 import Search from '@/components/Search'
 import Widget from '@/components/Widget'
-import Forecast from '@/components/Forecast'
 import uiSwitch from '@/components/Switch'
+
 
 export default {
 	name: 'App',
@@ -51,7 +51,6 @@ export default {
 		Background,
 		Search,
 		Widget,
-		Forecast,
 		uiSwitch,
 	},
 	methods: {
@@ -108,9 +107,9 @@ export default {
 	}
 }
 
-body {
-	position: relative;
-}
+// body {
+// 	position: relative;
+// }
 
 #app {
 	display: flex;
@@ -122,7 +121,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
-	max-width: 500px;
+	max-width: var(--width);
 	margin: 100px auto;
 
 	@media (min-width: 500px) {
@@ -131,7 +130,7 @@ body {
 }
 
 .units {
-	margin-top: -72px;
+	margin-top: -44px;
 	margin-left: auto;
 	margin-bottom: 15px;
 	padding-right: 5px;
@@ -159,6 +158,8 @@ body {
 
 // google places autocomplete list
 .pac-container {
+	width: 100% !important;
+	max-width: var(--width);
 	margin-top: 2px;
 	font-family: inherit;
 	background-color: #FFF;
@@ -227,5 +228,14 @@ body {
 .pac-icon {
 	display: none;
 }
+
+</style>
+
+
+<style lang="postcss">
+
+/* body::after {
+	background: linear-gradient(to top, #F0F0F0, cubic-bezier(1, 0, 1, 0), transparent);
+} */
 
 </style>

@@ -148,11 +148,12 @@ export default {
 	font-size: 20px;
 	color: #FFF;
 	background-color: #000;
+	// -webkit-box-reflect: below 0;
+	opacity: 0;
+	transition: opacity .3s;
 	user-select: none;
 	box-sizing: border-box;
 	overflow: hidden;
-	opacity: 0;
-	transition: opacity .3s;
 	z-index: 1;
 
 	&.visible {

@@ -17,10 +17,10 @@ onmessage = e => {
 
 	cancelAnimationFrame(self.radId)
 
-	self.rafId = update(ctx, data, options)
+	self.rafId = self.update(ctx, data, options)
 }
 
-let update = (...args) => {
+self.update = (...args) => {
 	self.radId = requestAnimationFrame(() => update(...args))
 
 	draw(...args)

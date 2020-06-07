@@ -62,7 +62,6 @@ i {
 
 img {
 	height: 100%;
-	filter: invert(100%);
 }
 
 </style>

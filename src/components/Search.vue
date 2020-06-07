@@ -188,7 +188,6 @@ button {
 	animation-direction: alternate;
 	animation-iteration-count: infinite;
 	animation-play-state: paused;
-	transition: transform .2s;
 
 	&:disabled {
 		animation-play-state: running;
