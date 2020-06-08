@@ -41,6 +41,8 @@ export default new Vuex.Store({
 
 		city: {},
 		forecast: {},
+
+		last_update: null,
 	},
 	mutations: {
 		setLanguage: (state, data) => {
@@ -81,6 +83,8 @@ export default new Vuex.Store({
 
 				return groups
 			}, {})
+
+			state.last_update = Date.now()
 		},
 	},
 	getters: {

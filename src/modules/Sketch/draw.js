@@ -17,11 +17,11 @@ let draw = (ctx, dots = [], { W, H, threshold }) => {
 	for (i = 0; i < dots.length; i++) {
 
 		// check viewport collisions
-		if (dots[i].x - dots[i].r < 0 && dots[i].s.x <= 0) dots[i].s.x *= -1
-		else if (dots[i].x + dots[i].r > W && dots[i].s.x >= 0) dots[i].s.x *= -1
+		if (dots[i].x - dots[i].r <= 0 && dots[i].s.x <= 0) dots[i].s.x *= -1
+		else if (dots[i].x + dots[i].r >= W && dots[i].s.x >= 0) dots[i].s.x *= -1
 
-		if (dots[i].y - dots[i].r < 0 && dots[i].s.y <= 0) dots[i].s.y *= -1
-		else if (dots[i].y + dots[i].r > H && dots[i].s.y >= 0) dots[i].s.y *= -1
+		if (dots[i].y - dots[i].r <= 0 && dots[i].s.y <= 0) dots[i].s.y *= -1
+		else if (dots[i].y + dots[i].r >= H && dots[i].s.y >= 0) dots[i].s.y *= -1
 
 
 		// draw lines between

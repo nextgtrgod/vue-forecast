@@ -73,7 +73,7 @@ export default {
 					longitude: coords.longitude,
 				})
 
-				this.getCity()
+				await this.getCity()
 
 			} catch (error) {
 				this.$refs['button'].classList.remove('error')
@@ -84,19 +84,24 @@ export default {
 		},
 
 		getCity() {
-			let options = {
-				location: new google.maps.LatLng(this.coords.latitude, this.coords.longitude)
-			}
+			return new Promise((resolve, reject) => {
 
-			this.geocoder.geocode(options, (results, status) => {
-				if (!status === 'OK') return
+				let options = {
+					location: new google.maps.LatLng(this.coords.latitude, this.coords.longitude)
+				}
+	
+				this.geocoder.geocode(options, (results, status) => {
+					if (!status === 'OK' || !results) return reject()
 
-				let city = results.find(r => r.types.includes('locality'))
+					let city = results.find(r => r.types.includes('locality'))
+	
+					if (!city) return reject()
+	
+					document.title = city.formatted_address
+					this.query = city.formatted_address
 
-				if (!city) return
-
-				document.title = city.formatted_address
-				this.query = city.formatted_address
+					resolve()
+				})
 			})
 		},
 

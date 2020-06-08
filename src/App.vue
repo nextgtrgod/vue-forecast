@@ -21,7 +21,9 @@ en:
 			:title="$t('units')"
 		/>
 		<search ref="search"/>
-		<widget/>
+		<widget>
+			<chart/>
+		</widget>
 	</div>
 
 	<ui-switch
@@ -42,6 +44,7 @@ import API from '@/config'
 import Background from '@/components/Background'
 import Search from '@/components/Search'
 import Widget from '@/components/Widget'
+import Chart from '@/components/Chart'
 import uiSwitch from '@/components/Switch'
 
 
@@ -51,12 +54,13 @@ export default {
 		Background,
 		Search,
 		Widget,
+		Chart,
 		uiSwitch,
 	},
 	methods: {
-		async getForecast(coords) {
+		async getForecast() {
 			try {
-				let res = await fetch(API.forecast(coords, this.language, this.units))
+				let res = await fetch(API.forecast(this.coords, this.language, this.units))
 				let data = await res.json()
 				this.$store.commit('setForecast', data)
 
@@ -68,14 +72,15 @@ export default {
 		switchUnits() {
 			this.$store.commit('setUnits', this.units === 'metric' ? 'imperial' : 'metric')
 
-			this.getForecast(this.coords)
+			this.getForecast()
 		},
 
-		async switchLanguage() {
+		switchLanguage() {
 			this.$store.commit('setLanguage', this.language === 'en' ? 'ru' : 'en')
 
-			await this.$refs['search'].init()
-			this.getForecast(this.coords)
+			this.$refs['search']
+				.init()
+				.then(this.getForecast)
 		},
 	},
 	computed: {
@@ -107,9 +112,9 @@ export default {
 	}
 }
 
-// body {
-// 	position: relative;
-// }
+body {
+	position: relative;
+}
 
 #app {
 	display: flex;
@@ -132,11 +137,11 @@ export default {
 .units {
 	margin-top: -44px;
 	margin-left: auto;
+	margin-right: 5px;
 	margin-bottom: 15px;
-	padding-right: 5px;
 
 	@media (min-width: 500px) {
-		padding-right: 0;
+		margin-right: 0;
 	}
 }
 

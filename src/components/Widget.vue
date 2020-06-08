@@ -1,5 +1,6 @@
 <i18n>
 ru:
+ feels-like: "но ощущается как"
  humidity: "Влажность"
  wind:
   title: "Направление и скорость ветра"
@@ -11,6 +12,7 @@ ru:
   units: "мм. рт. ст."
  cloudiness: "Облачность"
 en:
+ feels-like: "but feels like"
  humidity: "Humidity"
  wind:
   title: "Wind direction and speed"
@@ -26,13 +28,16 @@ en:
 
 <template>
 <section id="widget" :class="{ visible: today }">
-	<template v-if="today">
+	<div v-if="today" class="content">
 		<div class="status">
 			<icon :id="now.weather[0].id" :daytime="daytime"/>
 			<h2>{{ description }}</h2>
 		</div>
 		<div class="temperature">
 			<h1>{{ temperature.current }}°</h1>
+			<span v-show="temperature.current !== temperature.feels">
+				{{ $t('feels-like') }} <strong>{{ temperature.feels }}°</strong>
+			</span>
 			<p>
 				{{ temperature.min !== temperature.max ? `${temperature.min}..${temperature.max}°` : null }}
 			</p>
@@ -43,7 +48,8 @@ en:
 				<span :data-units="item.units">{{ item.value }}</span>
 			</li>
 		</ul>
-	</template>
+	</div>
+	<slot/>
 </section>
 </template>
 
@@ -96,7 +102,8 @@ export default {
 			}), { min: [], max: [] })
 
 			return {
-				current: Math.round(this.now.main.temp),
+				current,
+				feels: Math.round(this.now.main.feels_like),
 				min: Math.round(Math.min(...min)),
 				max: Math.round(Math.max(...max)),
 			}
@@ -140,15 +147,12 @@ export default {
 
 <style lang="scss" scoped>
 
+$width: 520px;
+
 #widget {
-	height: 210px;
-	padding: 15px 0;
-	display: flex;
-	align-items: center;
-	font-size: 20px;
 	color: #FFF;
-	background-color: #000;
-	// -webkit-box-reflect: below 0;
+	
+	font-size: 0;
 	opacity: 0;
 	transition: opacity .3s;
 	user-select: none;
@@ -159,22 +163,25 @@ export default {
 	&.visible {
 		opacity: 1;
 	}
+}
+
+.content {
+	display: flex;
+	align-items: center;
+	padding-top: 15px;
+	font-size: 20px;
+	background-color: #000;
 
 	@media (min-width: 500px) {
-		border-radius: var(--radius);
+		border-top-left-radius: var(--radius);
+		border-top-right-radius: var(--radius);
 	}
 }
 
 h1 {
 	font-size: 80px;
-	line-height: 1;
+	line-height: .95;
 	letter-spacing: -0.05em;
-}
-
-h1 + p {
-	height: 1em;
-	margin-left: 5px;
-	margin-bottom: 1em;
 }
 
 h2 {
@@ -191,7 +198,7 @@ h2 {
 
 .status {
 	width: 100%;
-	max-width: 190px;
+	max-width: 180px;
 	height: 100%;
 	max-height: 100%;
 	display: flex;
@@ -207,6 +214,23 @@ h2 {
 	justify-content: center;
 	height: 100%;
 	padding-left: 10px;
+
+	span {
+		margin-left: 4px;
+		margin-bottom: .5em;
+		font-size: .75em;
+		white-space: nowrap;
+	}
+
+	strong {
+		font-size: 1.2em;
+	}
+
+	p {
+		height: 1em;
+		margin-left: 4px;
+		margin-bottom: 1em;
+	}
 }
 
 ul {
@@ -218,8 +242,8 @@ ul {
 	margin-left: auto;
 	font-size: 20px;
 
-	@media (min-width: 500px) {
-		padding-right: 30px;
+	@media (min-width: $width) {
+		padding-right: 20px;
 	}
 
 	li {
