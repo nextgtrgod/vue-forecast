@@ -34,9 +34,11 @@ export default {
 			canvas: this.$refs['canvas'],
 			font,
 		})
+		let values = this.values.length
+			? this.values
+			: (new Array(40)).fill(0)
 
-		this.values = getArray(50)
-		this.chart.update(this.values)
+		this.chart.update(values)
 
 		// temp
 		document.addEventListener('keypress', ({ keyCode }) => {
@@ -61,23 +63,24 @@ export default {
 	},
 	computed: {
 		...mapState({
-			forecast: state => state.forecast,
+			values: state => {
+				let values = Object.values(state.forecast).reduce((arr, day) => (
+					[...arr, ...day.map(weather => Math.round(weather.main.temp))]
+				), [])
+
+				if (!values.length) return new Array(40).fill(0)
+				return values
+			},
 		}),
 	},
 	watch: {
-		forecast(now, old) {
-			let to = Object.values(now).reduce((arr, day) => (
-				[...arr, ...day.map(weather => Math.round(weather.main.temp))]
-			), [])
+		values(to, from) {
 
-			let from = Object.values(old).reduce((arr, day) => (
-				[...arr, ...day.map(weather => Math.round(weather.main.temp))]
-			), [])
+			console.log(to)
+			// let length = Math.min(to.length, from.length)
 
-			let length = Math.min(to.length, from.length)
-
-			to.length = length
-			from.length = length
+			// to.length = length
+			// from.length = length
 
 			this.animate(to, from)
 		},

@@ -30,7 +30,7 @@ export default {
 	},
 	async mounted() {
 		await this.init()
-		this.locate()
+		if (!this.coords) this.locate()
 	},
 	methods: {
 		init() {
