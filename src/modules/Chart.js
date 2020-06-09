@@ -1,101 +1,115 @@
 import remap from '@/utils/remap'
+import paper from 'paper'
+
+import rnd from '@/utils/random'
+
+let getArray = length => {
+	let arr = [0]
+
+	for (let i = 0; i < length; i++)
+		arr.push(rnd.range(5, 60))
+	
+	return arr
+}
 
 class Chart {
-	constructor({ canvas, font }) {
+	constructor({ canvas, font, bgColor, fillColor }) {
 		this.canvas = canvas
-		this.dpi = 2 || window.devicePixelRatio
-		this.ctx = this.canvas.getContext('2d', { alpha: false })
-		this.W = 520
+		this.W = 520 * 10
 		this.H = 100
 
-		this.canvas.width = this.W * this.dpi
-		this.canvas.height = this.H * this.dpi
+		this.canvas.width = this.W
+		this.canvas.height = this.H
 
-		this.font = {
-			size: 12 * this.dpi,
-			family: font,
-		}
-		this.ctx.font = `${this.font.size}px ${this.font.family}`
+		this.font = font
+		this.bgColor = bgColor
+		this.fillColor = fillColor
+		
+		let points = this.convert(getArray(40))
+		
+		this.init(points)
 	}
 
-	update(values = []) {
+	init(points) {
+		paper.setup(this.canvas)
+
+		this.background = paper.Path.Rectangle({
+			rectangle: paper.view.bounds,
+			fillColor: this.bgColor,
+		})
+
+		this.plot = new paper.Path({
+			segments: [
+				[ 0, this.H + 1 ],
+				...points.map(({ x, y }) => [ x, y ]),
+				[ this.W, this.H + 1 ],
+			],
+			fillColor: this.fillColor,
+		})
+		this.plot.smooth()
+
+		this.labels = []
+		for (let i = 0; i < points.length; i++) {
+	
+			let label = new paper.PointText({
+				content: points[i].content + '°',
+				fillColor: this.font.color,
+				fontFamily: this.font.family,
+				fontSize: this.font.size,
+				fontWeight: 'bold',
+			})
+
+			label.pivot = label.bounds.bottomCenter
+
+			let offset = 0
+
+			if (i === 0) offset = label.bounds.width
+			if (i === points.length - 1) offset = -label.bounds.width
+
+			label.position = new paper.Point(points[i].x + offset / 1.5, points[i].y)
+
+			this.labels.push(label)
+		}
+
+		this.chart = new paper.Group([ this.plot, ...this.labels ])
+		
+		this.chart.pivot = new paper.Point(0, this.H)
+	}
+
+	convert(values) {
 		let range = [
-			this.canvas.height / 6,
-			this.canvas.height - 2 * this.font.size,
+			this.H / 6,
+			this.H - 2 * this.font.size,
 		]
 		let min = Math.min(...values)
 		let max = Math.max(...values)
-		let step = 120 || this.canvas.width / (values.length - 1)
+		let step = 120 || this.W / (values.length - 1)
 
-		this.canvas.width = step * (values.length - 1)
+		// this.canvas.width = step * (values.length - 1)
 
-		this.ctx.font = `${this.font.size}px ${this.font.family}`
-
-		let points = values.map((value, i) => ({
+		return values.map((value, i) => ({
 			x: i * step,
-			y: this.canvas.height - remap(value, min, max, range[0], range[1]),
-			value,
+			y: this.H - remap(value, min, max, range[0], range[1]),
+			content: Math.round(value),
 		}))
-
-		this.draw(this.ctx, points)
 	}
 
-	draw(ctx, points) {
+	update(data = []) {
 
-		// ctx.globalCompositeOperation = 'xor'
-		ctx.fillStyle = '#000'
-		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+		let points = this.convert(data)
 
-		ctx.beginPath()
-		ctx.moveTo(0, ctx.canvas.height)
+		if (points[i].content === (points[i + 1] || {}).content) label.visible = false
+		else label.visible = true
+	}
 
-		let i = 0
-		ctx.lineTo(points[i].x, points[i].y)
+	scroll(direction) {
+		let offset = this.chart.position.x + 520 * direction
 
-		for (i = 1; i < points.length - 2; i++) {
+		console.log(offset)
+		
+		if (offset > 0) return
 
-			let c = {
-				x: (points[i].x + points[i + 1].x) / 2,
-				y: (points[i].y + points[i + 1].y) / 2,
-			}
-
-			ctx.quadraticCurveTo(points[i].x, points[i].y, c.x, c.y)
-		}
-		ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y)
-
-		ctx.lineTo(ctx.canvas.width, ctx.canvas.height)
-		ctx.closePath()
-		ctx.fillStyle = '#FFCD01'
-		ctx.fill()
-
-		// text
-		ctx.fillStyle = '#FFF'
-		ctx.textAlign = 'left'
-
-		let x = 0
-		let y = 0
-		let indent = this.font.size / 4
-		for (let i = 0; i < points.length; i++) {
-
-			ctx.textAlign = 'center'
-
-			if (points[i].value === (points[i + 1] || {}).value) continue
-
-			x = points[i].x
-
-			if (i === 0) {
-				x += indent
-				ctx.textAlign = 'left'
-			}
-			if (i === points.length - 1) {
-				x -= indent
-				ctx.textAlign = 'right'
-			}
-
-			y = points[i].y - this.font.size / 2
-
-			ctx.fillText(`${Math.round(points[i].value)}°`, x, y)
-		}
+		let tween = this.chart.tweenTo({ 'position.x': offset }, 200)
 	}
 }
 

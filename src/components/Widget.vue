@@ -157,7 +157,7 @@ $width: 520px;
 	transition: opacity .3s;
 	user-select: none;
 	box-sizing: border-box;
-	overflow: hidden;
+	// overflow: hidden;
 	z-index: 1;
 
 	&.visible {

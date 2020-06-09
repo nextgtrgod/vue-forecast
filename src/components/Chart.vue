@@ -1,27 +1,18 @@
 <template>
 <div id="chart">
 	<canvas ref="canvas"/>
+	<button @click="scroll(1)"/>
+	<button @click="scroll(-1)"/>
 </div>
 </template>
 
 
 <script>
 import { mapState } from 'vuex'
-import { Tween, autoPlay } from 'es6-tween'
+// import { Tween, autoPlay } from 'es6-tween'
 import Chart from '@/modules/Chart'
 
-autoPlay(true)
-
-import rnd from '@/utils/random'
-
-let getArray = length => {
-	let arr = []
-
-	for (let i = 0; i < length; i++)
-		arr.push(rnd.range(0, 30))
-	
-	return arr
-}
+// autoPlay(true)
 
 export default {
 	name: 'Chart',
@@ -32,17 +23,13 @@ export default {
 
 		this.chart = new Chart({
 			canvas: this.$refs['canvas'],
-			font,
-		})
-		let values = this.values.length
-			? this.values
-			: (new Array(40)).fill(0)
-
-		this.chart.update(values)
-
-		// temp
-		document.addEventListener('keypress', ({ keyCode }) => {
-			if (keyCode === 97) this.animate()
+			font: {
+				family: font,
+				size: 12,
+				color: '#FFF',
+			},
+			bgColor: '#000',
+			fillColor: '#31C0D1',
 		})
 	},
 	methods: {
@@ -54,12 +41,16 @@ export default {
 			})
 		},
 
-		animate(to, from) {
-			this.tween = new Tween(from)
-				.to(to, 1000)
-				.on('update', arr => this.chart.update(arr))
-				.start()
+		scroll(direction) {
+			this.chart.scroll(direction)
 		},
+
+		// animate(to, from) {
+		// 	this.tween = new Tween(from)
+		// 		.to(to, 1000)
+		// 		.on('update', arr => this.chart.update(arr))
+		// 		.start()
+		// },
 	},
 	computed: {
 		...mapState({
@@ -68,21 +59,13 @@ export default {
 					[...arr, ...day.map(weather => Math.round(weather.main.temp))]
 				), [])
 
-				if (!values.length) return new Array(40).fill(0)
 				return values
 			},
 		}),
 	},
 	watch: {
 		values(to, from) {
-
-			console.log(to)
-			// let length = Math.min(to.length, from.length)
-
-			// to.length = length
-			// from.length = length
-
-			this.animate(to, from)
+			// this.chart.update(to)
 		},
 	},
 }
@@ -93,14 +76,12 @@ export default {
 
 #chart {
 	// --radius: 16px;
-
 	position: relative;
 	top: -1px; // dirty
 	border-bottom-left-radius: var(--radius);
 	border-bottom-right-radius: var(--radius);
-	// border: 6px solid var(--color-text);
-	overflow: auto;
-
+	// overflow: auto;
+	overflow: hidden;
 	scrollbar-width: none;
 }
 
@@ -109,9 +90,25 @@ export default {
 }
 
 canvas {
-	height: 100px;
-	background-color: #000;
 	// border-radius: 8px;
+}
+
+button {
+	position: absolute;
+	top: 0;
+	display: inline-block;
+	height: 100px;
+	width: 50%;
+	cursor: pointer;
+	z-index: 1;
+
+	&:first-of-type {
+		left: 0;
+	}
+
+	&:last-of-type {
+		right: 0;
+	}
 }
 
 </style>

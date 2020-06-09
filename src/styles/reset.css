@@ -6,11 +6,8 @@ html {
 
 body {
 	height: 100%;
-	overflow: auto;
-}
-
-body {
 	margin: 0;
+	overflow: auto;
 	-webkit-overflow-scrolling: touch;
 	-webkit-tap-highlight-color: transparent;
 }
