@@ -12,6 +12,11 @@ import { mapState } from 'vuex'
 // import { Tween, autoPlay } from 'es6-tween'
 import Chart from '@/modules/Chart'
 
+let formatDate = t => {
+	let date = new Date(t)
+	return `${date.getUTCDate()}.${date.getUTCMonth()}.${date.getUTCFullYear()}`
+}
+
 // autoPlay(true)
 
 export default {
@@ -44,28 +49,23 @@ export default {
 		scroll(direction) {
 			this.chart.scroll(direction)
 		},
-
-		// animate(to, from) {
-		// 	this.tween = new Tween(from)
-		// 		.to(to, 1000)
-		// 		.on('update', arr => this.chart.update(arr))
-		// 		.start()
-		// },
 	},
 	computed: {
 		...mapState({
-			values: state => {
-				let values = Object.values(state.forecast).reduce((arr, day) => (
-					[...arr, ...day.map(weather => Math.round(weather.main.temp))]
-				), [])
+			groups: state => {
+				return state.forecast.hourly.reduce((groups, item) => {
+					let key = formatDate(item.dt * 1000)
 
-				return values
+					;(groups[key] = groups[key] || []).push(item.temp)
+
+					return groups
+				}, {})
 			},
 		}),
 	},
 	watch: {
-		values(to, from) {
-			// this.chart.update(to)
+		groups(gropus) {
+			this.chart.update(groups)
 		},
 	},
 }
@@ -77,11 +77,11 @@ export default {
 #chart {
 	// --radius: 16px;
 	position: relative;
-	top: -1px; // dirty
+	// top: -1px; // dirty
 	border-bottom-left-radius: var(--radius);
 	border-bottom-right-radius: var(--radius);
-	// overflow: auto;
-	overflow: hidden;
+	// overflow: visible;
+	overflow: auto;
 	scrollbar-width: none;
 }
 

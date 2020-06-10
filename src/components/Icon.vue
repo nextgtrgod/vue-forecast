@@ -36,7 +36,7 @@ export default {
 			try {
 				return require(`@/assets/images/icons/${icons[this.id]}_${this.daytime}.svg`)
 			} catch {
-				console.log(`no icon for id ${this.now.weather[0].id}: ${this.now.weather[0].main}`)
+				console.log(`no icon for id ${this.id}`)
 				return require(`@/assets/images/icons/sun_${this.daytime}.svg`)
 			}
 		},

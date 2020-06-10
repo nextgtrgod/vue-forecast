@@ -1,5 +1,6 @@
 <i18n>
 ru:
+ now: "Температура сейчас"
  feels-like: "но ощущается как"
  humidity: "Влажность"
  wind:
@@ -12,6 +13,7 @@ ru:
   units: "мм. рт. ст."
  cloudiness: "Облачность"
 en:
+ now: "Temperature now"
  feels-like: "but feels like"
  humidity: "Humidity"
  wind:
@@ -30,16 +32,16 @@ en:
 <section id="widget" :class="{ visible: today }">
 	<div v-if="today" class="content">
 		<div class="status">
-			<icon :id="now.weather[0].id" :daytime="daytime"/>
-			<h2>{{ description }}</h2>
+			<icon :id="icon.id" :daytime="icon.daytime"/>
+			<h2>{{ icon.description }}</h2>
 		</div>
-		<div class="temperature">
-			<h1>{{ temperature.current }}°</h1>
-			<span v-show="temperature.current !== temperature.feels">
-				{{ $t('feels-like') }} <strong>{{ temperature.feels }}°</strong>
+		<div class="temp">
+			<h1 :title="$t('now')">{{ temp.current }}°</h1>
+			<span v-show="temp.current !== temp.feels">
+				{{ $t('feels-like') }} <strong>{{ temp.feels }}°</strong>
 			</span>
 			<p>
-				{{ temperature.min !== temperature.max ? `${temperature.min}..${temperature.max}°` : null }}
+				{{ temp.min !== temp.max ? `${temp.min}..${temp.max}°` : null }}
 			</p>
 		</div>
 		<ul>
@@ -49,91 +51,92 @@ en:
 			</li>
 		</ul>
 	</div>
-	<slot/>
+	<chart v-if="today"/>
 </section>
 </template>
 
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import Icon from '@/components/Icon'
+import Chart from '@/components/Chart'
 
+import convert from '@/utils/convert'
 import makeFavicon from '@/utils/makeFavicon'
 
 export default {
 	name: 'Widget',
 	components: {
 		Icon,
+		Chart,
 	},
 	computed: {
 		...mapState({
-			city: state => state.city,
 			units: state => state.units,
+			current: state => state.forecast.current,
+			today: state => (state.forecast.daily || [])[0],
 		}),
 
 		daytime() {
 			let now = Date.now()
 
-			return now > (this.city.sunrise * 1000) && now < (this.city.sunset * 1000)
+			return now > (this.current.sunrise * 1000) && now < (this.current.sunset * 1000)
 				? 'day'
 				: 'night'
 		},
 
-		...mapGetters({
-			today: 'current',
-		}),
+		icon() {
+			let now = Date.now()
 
-		now() {
-			return this.today[0]
+			let daytime = now > (this.current.sunrise * 1000) && now < (this.current.sunset * 1000)
+				? 'day'
+				: 'night'
+	
+			return {
+				id: this.current.weather[0].id,
+				daytime,
+				description: this.current.weather[0].description,
+			}
 		},
 
-		description() {
-			return this.now.weather[0].description
-		},
-
-		temperature() {
-			let current = Math.round(this.now.main.temp)
+		temp() {
+			let current = convert.temp(this.current.temp)
 
 			makeFavicon(`${current}°`, 'bold 128px jura')
 
-			let { min, max } = this.today.reduce((range, forecast) => ({
-				min: [ ...range.min, forecast.main.temp_min ],
-				max: [ ...range.max, forecast.main.temp_max ],
-			}), { min: [], max: [] })
-
 			return {
 				current,
-				feels: Math.round(this.now.main.feels_like),
-				min: Math.round(Math.min(...min)),
-				max: Math.round(Math.max(...max)),
+				feels: convert.temp(this.current.feels_like),
+				min: convert.temp(this.today.temp.min),
+				max: convert.temp(this.today.temp.max),
 			}
 		},
 
 		info() {
 			return {
 				humidity: {
-					value: this.now.main.humidity,
+					value: this.current.humidity,
 					units: '%',
 					icon: require('@/assets/images/raindrop.svg'),
 					title: this.$t('humidity'),
 				},
 				wind: {
-					value: Math.round(this.now.wind.speed),
+					value: convert.speed(this.current.wind_speed),
 					units: this.$t(`wind.units.${this.units}`),
 					icon: require('@/assets/images/arrow.svg'),
 					style: {
-						transform: `rotate(${Math.round((this.now.wind.deg % 360) / 45) * 45}deg)`,
+						transform: `rotate(${Math.round((this.current.wind_deg % 360) / 45) * 45}deg)`,
 					},
 					title: this.$t('wind.title'),
 				},
 				pressure: {
-					value: Math.round(this.now.main.pressure / 1.33322368),
+					value: Math.round(this.current.pressure / 1.33322368),
 					units: this.$t('pressure.units'),
 					icon: require('@/assets/images/thermometer.svg'),
 					title: this.$t('pressure.title'),
 				},
 				cloudiness: {
-					value: this.now.clouds.all,
+					value: this.current.clouds,
 					units: '%',
 					icon: require('@/assets/images/cloud.svg'),
 					title: this.$t('cloudiness'),
@@ -151,7 +154,6 @@ $width: 520px;
 
 #widget {
 	color: #FFF;
-	
 	font-size: 0;
 	opacity: 0;
 	transition: opacity .3s;
@@ -166,11 +168,15 @@ $width: 520px;
 }
 
 .content {
+	position: relative;
+	height: 180px;
 	display: flex;
 	align-items: center;
 	padding-top: 15px;
 	font-size: 20px;
 	background-color: #000;
+	box-sizing: border-box;
+	z-index: 1;
 
 	@media (min-width: 500px) {
 		border-top-left-radius: var(--radius);
@@ -208,7 +214,7 @@ h2 {
 	box-sizing: border-box;
 }
 
-.temperature {
+.temp {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;

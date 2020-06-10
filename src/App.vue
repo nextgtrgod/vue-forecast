@@ -21,9 +21,7 @@ en:
 			:title="$t('units')"
 		/>
 		<search ref="search"/>
-		<widget>
-			<chart/>
-		</widget>
+		<widget/>
 	</div>
 
 	<ui-switch
@@ -44,7 +42,6 @@ import API from '@/config'
 import Background from '@/components/Background'
 import Search from '@/components/Search'
 import Widget from '@/components/Widget'
-import Chart from '@/components/Chart'
 import uiSwitch from '@/components/Switch'
 
 
@@ -54,7 +51,6 @@ export default {
 		Background,
 		Search,
 		Widget,
-		Chart,
 		uiSwitch,
 	},
 	methods: {
@@ -62,6 +58,7 @@ export default {
 			try {
 				let res = await fetch(API.forecast(this.coords, this.language, this.units))
 				let data = await res.json()
+
 				this.$store.commit('setForecast', data)
 
 			} catch (error) {
@@ -71,8 +68,6 @@ export default {
 
 		switchUnits() {
 			this.$store.commit('setUnits', this.units === 'metric' ? 'imperial' : 'metric')
-
-			this.getForecast()
 		},
 
 		switchLanguage() {

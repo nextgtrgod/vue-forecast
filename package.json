@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "build": "vue-cli-service build",
-    "start": "vue-cli-service serve",
-    "deploy": "./deploy.sh"
+    "deploy": "./deploy.sh",
+    "start": "vue-cli-service serve"
   },
   "dependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.10.1",
     "@kazupon/vue-i18n-loader": "^0.5.0",
+    "core-js": "^3.6.5",
     "es6-tween": "^5.5.11",
     "paper": "^0.12.8",
     "postcss-easing-gradients": "^3.0.1",
@@ -20,6 +22,7 @@
     "yaml-loader": "^0.6.0"
   },
   "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.4.0",
     "@vue/cli-plugin-vuex": "~4.3.0",
     "@vue/cli-service": "~4.3.0",
     "sass": "^1.26.3",
