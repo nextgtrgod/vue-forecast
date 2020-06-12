@@ -1,7 +1,7 @@
 <i18n>
 ru:
  now: "Температура сейчас"
- feels-like: "но ощущается как"
+ feels-like: "ощущается как"
  humidity: "Влажность"
  wind:
   title: "Направление и скорость ветра"
@@ -14,7 +14,7 @@ ru:
  cloudiness: "Облачность"
 en:
  now: "Temperature now"
- feels-like: "but feels like"
+ feels-like: "feels like"
  humidity: "Humidity"
  wind:
   title: "Wind direction and speed"
@@ -30,6 +30,7 @@ en:
 
 <template>
 <section id="widget" :class="{ visible: today }">
+	<chart v-if="today"/>
 	<div v-if="today" class="content">
 		<div class="status">
 			<icon :id="icon.id" :daytime="icon.daytime"/>
@@ -51,7 +52,6 @@ en:
 			</li>
 		</ul>
 	</div>
-	<chart v-if="today"/>
 </section>
 </template>
 
@@ -153,14 +153,22 @@ export default {
 $width: 520px;
 
 #widget {
+	position: relative;
+	width: 100%;
+	max-width: var(--width);
+	height: 280px;
 	color: #FFF;
 	font-size: 0;
 	opacity: 0;
 	transition: opacity .3s;
 	user-select: none;
 	box-sizing: border-box;
-	// overflow: hidden;
+	overflow: hidden;
 	z-index: 1;
+
+	@media (min-width: 500px) {
+		border-radius: var(--radius);
+	}
 
 	&.visible {
 		opacity: 1;
@@ -168,7 +176,10 @@ $width: 520px;
 }
 
 .content {
-	position: relative;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
 	height: 180px;
 	display: flex;
 	align-items: center;
@@ -176,12 +187,7 @@ $width: 520px;
 	font-size: 20px;
 	background-color: #000;
 	box-sizing: border-box;
-	z-index: 1;
-
-	@media (min-width: 500px) {
-		border-top-left-radius: var(--radius);
-		border-top-right-radius: var(--radius);
-	}
+	pointer-events: none;
 }
 
 h1 {

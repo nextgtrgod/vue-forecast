@@ -4,8 +4,7 @@ import checkBrowser from '@/utils/checkBrowser'
 const browser = checkBrowser()
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-// if (reducedMotion || browser !== 'chrome') {
-if (true) {
+if (reducedMotion || browser !== 'chrome') {
 	let link = document.createElement('link')
 	link.rel = 'stylesheet'
 	link.href = 'weather-icons/weather-icons.css'

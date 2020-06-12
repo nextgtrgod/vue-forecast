@@ -10,7 +10,7 @@ en:
 <div id="search">
 	<input type="text" v-model="query" ref="input">
 	<button @click="locate" :disabled="loading" :title="$t('location')" ref="button">
-		<img src="../assets/images/pin.svg" role="presentation">
+		<img src="@/assets/images/pin.svg" role="presentation">
 	</button>
 </div>
 </template>

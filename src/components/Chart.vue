@@ -1,20 +1,22 @@
 <template>
 <div id="chart">
 	<canvas ref="canvas"/>
-	<button @click="scroll(1)"/>
-	<button @click="scroll(-1)"/>
+	<!-- <button @click="scroll(1)"/>
+	<button @click="scroll(-1)"/> -->
 </div>
 </template>
 
 
 <script>
 import { mapState } from 'vuex'
+import convert from '@/utils/convert'
 // import { Tween, autoPlay } from 'es6-tween'
 import Chart from '@/modules/Chart'
 
 let formatDate = t => {
-	let date = new Date(t)
-	return `${date.getUTCDate()}.${date.getUTCMonth()}.${date.getUTCFullYear()}`
+	let d = new Date(t)
+
+	return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()).getTime()
 }
 
 // autoPlay(true)
@@ -36,6 +38,9 @@ export default {
 			bgColor: '#000',
 			fillColor: '#31C0D1',
 		})
+		this.chart.update(this.days)
+
+		this.$refs['canvas'].addEventListener('touchmove', ({ e }) => e.preventDefault())
 	},
 	methods: {
 		preload(font) {
@@ -45,27 +50,24 @@ export default {
 				document.fonts.load(`1em ${font}`).then(resolve)
 			})
 		},
-
-		scroll(direction) {
-			this.chart.scroll(direction)
-		},
 	},
 	computed: {
 		...mapState({
-			groups: state => {
-				return state.forecast.hourly.reduce((groups, item) => {
+			days: state => {
+				return Object.values(state.forecast.hourly.reduce((groups, item) => {
 					let key = formatDate(item.dt * 1000)
 
-					;(groups[key] = groups[key] || []).push(item.temp)
+					;(groups[key] = groups[key] || []).push(convert.temp(item.temp))
 
 					return groups
-				}, {})
+				}, {}))
 			},
 		}),
 	},
 	watch: {
-		groups(gropus) {
-			this.chart.update(groups)
+		days(days) {
+			
+			if (this.chart) this.chart.update(days)
 		},
 	},
 }
@@ -75,12 +77,8 @@ export default {
 <style lang="scss" scoped>
 
 #chart {
-	// --radius: 16px;
 	position: relative;
-	// top: -1px; // dirty
-	border-bottom-left-radius: var(--radius);
-	border-bottom-right-radius: var(--radius);
-	// overflow: visible;
+	height: 100%;
 	overflow: auto;
 	scrollbar-width: none;
 }
@@ -90,7 +88,12 @@ export default {
 }
 
 canvas {
-	// border-radius: 8px;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	min-width: 100%;
+	border-bottom-left-radius: var(--radius);
+	border-bottom-right-radius: var(--radius);
 }
 
 button {
