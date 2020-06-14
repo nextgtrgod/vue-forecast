@@ -1,9 +1,10 @@
 import paper from 'paper'
 import remap from '@/utils/remap'
+import random from '@/utils/random'
 
 let pages = 7
 let W = 520 * pages
-let H = 100
+let H = 200
 
 class Chart {
 	constructor({ canvas, font, bgColor, fillColor }) {
@@ -21,10 +22,10 @@ class Chart {
 	}
 
 	init() {
-		this.background = paper.Path.Rectangle({
-			rectangle: paper.view.bounds,
-			fillColor: this.bgColor,
-		})
+		// this.background = paper.Path.Rectangle({
+		// 	rectangle: paper.view.bounds,
+		// 	fillColor: this.bgColor,
+		// })
 
 		// this.chart = new paper.Group([ this.plot, ...this.labels ])
 		// this.chart.pivot = new paper.Point(0, this.H)
@@ -33,10 +34,13 @@ class Chart {
 	update(data) {
 		let points = this.convert(data)
 
-		paper.view.viewSize.width = points[points.length - 1].x
+		W = points[points.length - 1].x
+
+		paper.view.viewSize.width = W
 
 		if (this.plot) this.plot.remove()
 		if (this.labels) this.labels.forEach(label => label.remove())
+		if (this.dividers) this.labels.forEach(divider => divider.remove())
 
 		this.plot = new paper.Path({
 			segments: [
@@ -51,7 +55,7 @@ class Chart {
 		this.labels = []
 		for (let i = 0; i < points.length; i++) {
 
-			if (points[i].content === (points[i - 1] || {}).content) continue
+			// if (points[i].content === (points[i - 1] || {}).content) continue
 	
 			let label = new paper.PointText({
 				content: points[i].content,
@@ -60,22 +64,39 @@ class Chart {
 				fontSize: this.font.size,
 				fontWeight: 'bold',
 			})
-			label.pivot = label.bounds.bottomCenter
+			label.pivot = label.bounds.bottomLeft
 
 			let offset = 0
 
-			if (i === 0) offset = label.bounds.width
-			if (i === points.length - 1) offset = -label.bounds.width
+			if (i % 4 === 0) {
+				label.fontSize = 28
+				offset = 6
 
-			label.position = new paper.Point(points[i].x + offset / 1.5, points[i].y)
+				// offset = label.bounds.width
+			}
+			// if (i === points.length - 1) offset = -label.bounds.width
+
+			label.position = new paper.Point(points[i].x + offset, points[i].y)
 
 			this.labels.push(label)
+		}
+
+		this.dividers = []
+		for (let i = 0; i < points.length; i+=4) {
+
+			let divider = new paper.Path({
+				segments: [[ points[i].x - 1, points[i].y ], [ points[i].x - 1, H ]],
+				strokeColor: '#FFF',
+				dashArray: [5, 5],
+			})
+
+			this.dividers.push(divider)
 		}
 	}
 
 	convert(data) {
 		let range = [
-			H / 6,
+			100,
 			H - 2 * this.font.size,
 		]
 
@@ -83,21 +104,35 @@ class Chart {
 
 		let min = Math.min(...flat_data)
 		let max = Math.max(...flat_data)
-	
-		return data.reduce((points, day, i) => {
+		let step = 0
 
-			let step = 520 / day.length
+		let points = data.reduce((points, day, i) => {
+
+			step = 520 / (day.length)
 
 			return [
 				...points,
 				...day.map((temp, j) => ({
 					x: i * 520 + j * step,
 					y: H - remap(temp, min, max, range[0], range[1]),
-					content: temp,
+					content: temp + '°',
 				}))
 			]
 
 		}, [])
+
+		// finish chart
+		for (let i = 0; i < 5; i++) {
+			points.push({
+				x: points[points.length - 1].x + step,
+				y: H - remap(random.range(min, max), min, max, range[0], range[1]),
+				content: '🤔',
+			})
+		}
+
+		console.log(points)
+
+		return points
 	}
 
 	// scroll(direction) {

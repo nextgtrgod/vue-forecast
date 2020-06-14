@@ -21,7 +21,7 @@ en:
 			:title="$t('units')"
 		/>
 		<search ref="search"/>
-		<widget/>
+		<widget v-if="daily"/>
 	</div>
 
 	<ui-switch
@@ -83,6 +83,7 @@ export default {
 			language: state => state.language,
 			coords: state => state.coords,
 			units: state => state.units,
+			daily: state => state.forecast.daily,
 		}),
 	},
 	watch: {

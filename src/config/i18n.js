@@ -13,9 +13,32 @@ if (document.documentElement.lang !== language)
 	document.documentElement.lang = language
 
 
+const dateTimeFormats = {
+	'en': {
+		'weekday': {
+			weekday: 'long',
+		},
+		'date': {
+			day: 'numeric',
+			month: 'long',
+		},
+	},
+	'ru': {
+		'weekday': {
+			weekday: 'long',
+		},
+		'date': {
+			day: 'numeric',
+			month: 'long',
+		},
+	}
+}
+
+
 const i18n = new VueI18n({
 	locale: language,
 	fallbackLocale: supported[0],
+	dateTimeFormats,
 	silentFallbackWarn: true,
 })
 
