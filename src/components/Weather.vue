@@ -31,7 +31,7 @@ ru:
 <template>
 <div id="weather" :class="{ visible: today }">
 	<div class="status">
-		<icon :id="icon.id" :daytime="icon.daytime"/>
+		<icon :id="icon.id" :daytime="icon.daytime" class="icon"/>
 		<h2>{{ icon.description }}</h2>
 	</div>
 	<div class="temp">
@@ -158,13 +158,17 @@ export default {
 	box-sizing: border-box;
 	// pointer-events: none;
 
+	@media (min-width: 375px) {
+		font-size: 18px;
+	}
+
 	@media (min-width: $app-width) {
 		font-size: 20px;
 	}
 }
 
 h1 {
-	font-size: 4em;
+	font-size: 4.5em;
 	line-height: .95;
 	letter-spacing: -0.05em;
 }
@@ -185,12 +189,16 @@ h2 {
 	width: 100%;
 	max-width: 9em;
 	height: 100%;
-	max-height: 100%;
+	min-height: 100%;
 	display: flex;
 	flex-direction: column;
 	align-items: flex-end;
 	border-right: 1px dashed;
 	box-sizing: border-box;
+}
+
+.icon {
+	height: 150px;
 }
 
 .temp {
@@ -226,13 +234,16 @@ h2 {
 ul {
 	display: none;
 	width: 100%;
-	max-width: 120px;
-	padding-right: 20px;
+	max-width: 105px;
 
-	@media (min-width: 440px) {
+	@media (min-width: 465px) {
 		display: flex;
 		flex-direction: column;
 		margin-left: auto;
+	}
+
+	@media (min-width: $app-width) {
+		max-width: 140px;
 	}
 
 	li {

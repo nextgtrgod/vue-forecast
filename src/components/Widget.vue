@@ -2,9 +2,7 @@
 <section id="widget">
 	<weather/>
 
-	<div class="scroll-area">
-		<canvas ref="canvas"/>
-
+	<div class="scroll-area" ref="scroll-area">
 		<ul>
 			<forecast
 				v-for="(day, i) in days"
@@ -13,6 +11,8 @@
 			/>
 			<forecast :date="lastDate" />
 		</ul>
+
+		<canvas ref="canvas"/>
 	</div>
 </section>
 </template>
@@ -45,14 +45,12 @@ export default {
 		progress: 0,
 	}),
 	mounted() {
-
 		this.init()
 
-		this.$el.addEventListener('scroll', e => {
+		let scrollArea = this.$refs['scroll-area']
+		scrollArea.addEventListener('scroll', e => {
 
-			this.progress = this.$el.scrollLeft / (this.$el.scrollWidth - this.$el.clientWidth)
-
-			// console.log(this.progress)
+			this.progress = scrollArea.scrollLeft / (scrollArea.scrollWidth - scrollArea.clientWidth)
 		})
 	},
 	methods: {
@@ -86,7 +84,7 @@ export default {
 		...mapState({
 			days: state => (
 				state.forecast.daily.map(day => ({
-					date: day.dt * 1000,
+					date: convert.date(day.dt),
 					temp: ['morn', 'day', 'eve', 'night'].map(daytime => 
 						convert.temp(day.temp[daytime])
 					)
@@ -103,8 +101,17 @@ export default {
 		},
 	},
 	watch: {
-		days(days) {
-			if (this.chart) this.chart.update(days)
+		values(values) {
+			if (!this.chart) return
+
+			this.chart.update(values)
+
+			this.$nextTick(() => {
+				this.$refs['scroll-area'].scrollTo({
+					left: 0,
+					behavior: 'smooth',
+				})
+			})
 		},
 	},
 }
@@ -116,10 +123,11 @@ export default {
 
 #widget {
 	position: relative;
-	height: 380px;
+	height: 375px;
 	color: var(--color-text);
 	background: linear-gradient(to bottom, var(--color-bg) 280px, var(--color-chart) 281px);
 	overflow: hidden;
+	-webkit-mask-image: -webkit-radial-gradient(white, black);
 	user-select: none;
 
 	@media (min-width: $app-width) {
@@ -127,7 +135,12 @@ export default {
 	}
 }
 
+html.safari #widget {
+	background: var(--color-bg);
+}
+
 .scroll-area {
+	position: relative;
 	height: 100%;
 	display: flex;
 	flex-direction: column;
@@ -141,16 +154,18 @@ export default {
 }
 
 canvas {
-	margin-top: auto;
+	position: absolute;
+	left: 0;
+	bottom: 0;
 	min-width: 100%;
 	background-color: var(--color-bg);
 }
 
 ul {
-	margin-top: -100px;
+	margin-top: auto;
 	display: flex;
 	width: 100%;
-	height: 100px;
+	height: 185px;
 	font-size: 24px;
 	z-index: 1;
 

@@ -10,4 +10,6 @@ export default {
 		'metric': s => Math.round(s),
 		'imperial': s => Math.round(s * 2.237),
 	}[store.state.units])(t),
+
+	date: t => (t + store.state.forecast.timezone_offset) * 1000
 }

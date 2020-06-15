@@ -9,7 +9,7 @@ let checkBrowser = () => {
 	let saf		= ua.indexOf('safari')
 	let root	= document.getElementsByTagName('html')[0]
 
-	if (typeof window.orientation !== 'undefined') root.classList.add('mobile-device')
+	// if (typeof window.orientation !== 'undefined') root.classList.add('mobile-device')
 
 	if (msie > 0 || trident > 0 || edge > 0) return 'ie'
 	else if (moz > 0) return 'firefox'

@@ -57,7 +57,7 @@ export default {
 
 i {
 	padding-right: 10px;
-	font-size: 100px;
+	font-size: 85px;
 }
 
 img {

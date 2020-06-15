@@ -5,7 +5,7 @@ import random from '@/utils/random'
 let appWidth = 0
 let pages = 7
 let W = appWidth * pages
-let H = 200
+let H = 100
 
 class Chart {
 	constructor({ canvas, font, bgColor, fillColor }) {
@@ -40,7 +40,7 @@ class Chart {
 
 		if (this.plot) this.plot.remove()
 		if (this.labels) this.labels.forEach(label => label.remove())
-		if (this.dividers) this.dividers.forEach(divider => divider.remove())
+		// if (this.dividers) this.dividers.forEach(divider => divider.remove())
 
 		this.plot = new paper.Path({
 			segments: [
@@ -50,12 +50,14 @@ class Chart {
 			],
 			fillColor: this.fillColor,
 		})
-		this.plot.smooth()
+		this.plot.smooth({
+			// type: 'catmull-rom',
+			// factor: .1,
+			from: 2,
+		})
 
 		this.labels = []
 		for (let i = 0; i < points.length; i++) {
-
-			// if (points[i].content === (points[i - 1] || {}).content) continue
 	
 			let label = new paper.PointText({
 				content: points[i].content,
@@ -68,35 +70,34 @@ class Chart {
 
 			let offset = 0
 
-			if (i % 4 === 0) {
-				label.fontSize = 28
-				offset = 6
+			if (i % 4 === 0) offset = 12
 
-				// offset = label.bounds.width
+			if ((i + 3) % 4 === 0) {
+				label.fontSize = 28
+				offset = -2
 			}
-			// if (i === points.length - 1) offset = -label.bounds.width
 
 			label.position = new paper.Point(points[i].x + offset, points[i].y)
 
 			this.labels.push(label)
 		}
 
-		this.dividers = []
-		for (let i = 0; i < points.length; i+=4) {
+		// this.dividers = []
+		// for (let i = 0; i < points.length; i+=4) {
 
-			let divider = new paper.Path({
-				segments: [[ points[i].x - 1, points[i].y ], [ points[i].x - 1, H ]],
-				strokeColor: this.font.color,
-				dashArray: [5, 5],
-			})
+		// 	let divider = new paper.Path({
+		// 		segments: [[ points[i].x - 1, H ], [ points[i].x - 1, 20 ]],
+		// 		strokeColor: this.font.color,
+		// 		dashArray: [3, 2],
+		// 	})
 
-			this.dividers.push(divider)
-		}
+		// 	this.dividers.push(divider)
+		// }
 	}
 
 	convert(data) {
 		let range = [
-			100,
+			H / 6,
 			H - 2 * this.font.size,
 		]
 
@@ -122,13 +123,18 @@ class Chart {
 		}, [])
 
 		// finish chart
-		for (let i = 0; i < 5; i++) {
+		for (let i = 0; i < 4; i++) {
 			points.push({
 				x: points[points.length - 1].x + step,
 				y: H - remap(random.range(min, max), min, max, range[0], range[1]),
 				content: '🤔',
 			})
 		}
+
+		points.push({
+			...points[points.length - 1],
+			x: points[points.length - 1].x + step,
+		})
 
 		return points
 	}

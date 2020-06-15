@@ -13,13 +13,13 @@ ru:
 
 <template>
 <li class="forecast">
-	<ul class="daytimes">
-		<li v-for="(daytime, i) in daytimes" :key="i">
-			{{ $t(daytime) }}
-		</li>
-	</ul>
 	<h3>{{ $d(date, 'weekday') }}</h3>
 	<h4>{{ $d(date, 'date') }}</h4>
+	<ul class="daytimes">
+		<li v-for="(daytime, i) in daytimes" :key="i">
+			{{ $t(daytime) }}:
+		</li>
+	</ul>
 </li>
 </template>
 
@@ -44,14 +44,39 @@ export default {
 @import '@/styles/variables';
 
 .forecast {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	width: min(100vw, var(--width));
-	padding-bottom: 18px;
-	// background-color: #31C0D1;
+	height: 100%;
 	text-transform: lowercase;
 	box-sizing: border-box;
 	scroll-snap-align: start;
+
+	&:before {
+		content: '';
+		position: absolute;
+		top: 10px;
+		left: -1px;
+		bottom: 0;
+		width: 1px;
+		border-left: 1px dashed;
+	}
+}
+
+h3 {
+	padding-left: 10px;
+	font-size: 42px;
+}
+
+h4 {
+	margin-bottom: 10px;
+	padding-left: 12px;
+	font-size: 20px;
+}
+
+h3, h4 {
+	font-weight: 400;
 }
 
 ul.daytimes {
@@ -64,31 +89,8 @@ ul.daytimes {
 	}
 
 	li:first-child {
-		padding-left: 7px;
+		padding-left: 12px;
 	}
-}
-
-h4 {
-	padding-left: 5px;
-}
-
-h3 {
-	padding-left: 4px;
-}
-
-h3, h4 {
-	font-weight: 400;
-}
-
-h3 {
-	margin-top: auto;
-	font-size: 42px;
-	line-height: 1;
-}
-
-h4 {
-	font-size: 20px;
-	margin-left: 2px;
 }
 
 </style>

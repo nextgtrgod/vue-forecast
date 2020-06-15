@@ -4,6 +4,8 @@ import checkBrowser from '@/utils/checkBrowser'
 const browser = checkBrowser()
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+document.documentElement.classList.add(browser)
+
 if (reducedMotion || browser !== 'chrome') {
 	let link = document.createElement('link')
 	link.rel = 'stylesheet'
