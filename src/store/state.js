@@ -32,8 +32,8 @@ export default {
 	language: i18n.locale,
 	units,
 
-	city: {},
-	forecast: {},
+	// city: {},
+	forecast: null,
 
 	last_update: null,
 }

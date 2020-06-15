@@ -1,6 +1,6 @@
 <template>
-<div id="widget">
-	<details-view/>
+<section id="widget">
+	<weather/>
 
 	<div class="scroll-area">
 		<canvas ref="canvas"/>
@@ -14,13 +14,13 @@
 			<forecast :date="lastDate" />
 		</ul>
 	</div>
-</div>
+</section>
 </template>
 
 
 <script>
 import { mapState } from 'vuex'
-import DetailsView from '@/components/Details'
+import Weather from '@/components/Weather'
 import Forecast from '@/components/Forecast'
 
 import convert from '@/utils/convert'
@@ -38,7 +38,7 @@ let formatDate = t => {
 export default {
 	name: 'Widget',
 	components: {
-		DetailsView,
+		Weather,
 		Forecast,
 	},
 	data: () => ({
@@ -58,6 +58,7 @@ export default {
 	methods: {
 		init() {
 			let font = 'jura'
+			let rootStyle = getComputedStyle(document.documentElement)
 
 			this.preload(font).then(() => {
 
@@ -66,44 +67,31 @@ export default {
 					font: {
 						family: font,
 						size: 16,
-						color: '#FFF',
+						color: rootStyle.getPropertyValue('--color-text'),
 					},
-					bgColor: '#000',
-					fillColor: '#31C0D1',
+					bgColor: 	rootStyle.getPropertyValue('--color-bg'),
+					fillColor: 	rootStyle.getPropertyValue('--color-chart'),
 				})
 				this.chart.update(this.values)
 			})
 		},
 
-		preload(font) {
-			return new Promise(resolve => {
-				if (!('fonts' in document)) return resolve()
+		preload: font => new Promise(resolve => {
+			if (!('fonts' in document)) return resolve()
 
-				document.fonts.load(`1em ${font}`).then(resolve)
-			})
-		},
+			document.fonts.load(`1em ${font}`).then(resolve)
+		}),
 	},
 	computed: {
 		...mapState({
-			days: state => {
-				return state.forecast.daily.map(day => {
-					// let key = formatDate(item.dt * 1000)
-
-					return {
-						date: day.dt * 1000,
-						temp: ['morn', 'day', 'eve', 'night'].map(daytime => 
-							convert.temp(day.temp[daytime])
-						)
-					}
-
-					// ;['morn', 'day', 'eve', 'night'].forEach(daytime => {
-
-					// 	;(groups[key] = groups[key] || []).push(convert.temp(item.temp[daytime]))
-					// })
-
-					// return groups
-				})
-			},
+			days: state => (
+				state.forecast.daily.map(day => ({
+					date: day.dt * 1000,
+					temp: ['morn', 'day', 'eve', 'night'].map(daytime => 
+						convert.temp(day.temp[daytime])
+					)
+				}))
+			),
 		}),
 
 		values() {
@@ -114,25 +102,29 @@ export default {
 			return this.days[this.days.length - 1].date + 86400000
 		},
 	},
-	// watch: {
-	// 	days(days) {
-			
-	// 		if (this.chart) this.chart.update(days)
-	// 	},
-	// },
+	watch: {
+		days(days) {
+			if (this.chart) this.chart.update(days)
+		},
+	},
 }
 </script>
 
 
 <style lang="scss" scoped>
+@import '@/styles/variables';
 
 #widget {
 	position: relative;
 	height: 380px;
-	color: #FFF;
+	color: var(--color-text);
+	background: linear-gradient(to bottom, var(--color-bg) 280px, var(--color-chart) 281px);
 	overflow: hidden;
-	border-radius: var(--radius);
 	user-select: none;
+
+	@media (min-width: $app-width) {
+		border-radius: var(--radius);
+	}
 }
 
 .scroll-area {
@@ -151,7 +143,7 @@ export default {
 canvas {
 	margin-top: auto;
 	min-width: 100%;
-	background-color: #000;
+	background-color: var(--color-bg);
 }
 
 ul {

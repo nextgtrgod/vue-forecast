@@ -29,7 +29,7 @@ ru:
 
 
 <template>
-<section id="details" :class="{ visible: today }">
+<div id="weather" :class="{ visible: today }">
 	<div class="status">
 		<icon :id="icon.id" :daytime="icon.daytime"/>
 		<h2>{{ icon.description }}</h2>
@@ -49,7 +49,7 @@ ru:
 			<span :data-units="item.units">{{ item.value }}</span>
 		</li>
 	</ul>
-</section>
+</div>
 </template>
 
 
@@ -61,7 +61,7 @@ import convert from '@/utils/convert'
 import makeFavicon from '@/utils/makeFavicon'
 
 export default {
-	name: 'Details',
+	name: 'Weather',
 	components: {
 		Icon,
 	},
@@ -144,45 +144,46 @@ export default {
 
 
 <style lang="scss" scoped>
+@import '@/styles/variables';
 
-$width: 520px;
-
-#details {
+#weather {
 	position: absolute;
 	top: 0;
 	left: 0;
 	right: 0;
-	height: 180px;
 	display: flex;
 	align-items: center;
-	padding-top: 15px;
-	font-size: 20px;
-	background-color: #000;
+	font-size: 16px;
+	padding: .75em 0;
 	box-sizing: border-box;
 	// pointer-events: none;
+
+	@media (min-width: $app-width) {
+		font-size: 20px;
+	}
 }
 
 h1 {
-	font-size: 80px;
+	font-size: 4em;
 	line-height: .95;
 	letter-spacing: -0.05em;
 }
 
 h2 {
-	height: .8em;
 	margin-bottom: -2px;
 	padding: 0 10px;
 	display: flex;
 	align-items: flex-end;
 	margin-top: auto;
-	font-size: inherit;
+	font-size: 1em;
+	height: .8em;
 	line-height: 1;
 	text-align: right;
 }
 
 .status {
 	width: 100%;
-	max-width: 180px;
+	max-width: 9em;
 	height: 100%;
 	max-height: 100%;
 	display: flex;
@@ -196,8 +197,13 @@ h2 {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	font-size: 1.25em;
 	height: 100%;
 	padding-left: 10px;
+
+	@media (min-width: $app-width) {
+		font-size: 1em;
+	}
 
 	span {
 		margin-left: 4px;
@@ -218,16 +224,15 @@ h2 {
 }
 
 ul {
+	display: none;
 	width: 100%;
 	max-width: 120px;
-	padding-right: 10px;
-	display: flex;
-	flex-direction: column;
-	margin-left: auto;
-	font-size: 20px;
+	padding-right: 20px;
 
-	@media (min-width: $width) {
-		padding-right: 20px;
+	@media (min-width: 440px) {
+		display: flex;
+		flex-direction: column;
+		margin-left: auto;
 	}
 
 	li {

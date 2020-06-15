@@ -41,11 +41,12 @@ export default {
 
 
 <style lang="scss" scoped>
+@import '@/styles/variables';
 
 .forecast {
 	display: flex;
 	flex-direction: column;
-	width: min(100vw, 520px);
+	width: min(100vw, var(--width));
 	padding-bottom: 18px;
 	// background-color: #31C0D1;
 	text-transform: lowercase;

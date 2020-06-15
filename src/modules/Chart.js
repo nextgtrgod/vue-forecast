@@ -2,8 +2,9 @@ import paper from 'paper'
 import remap from '@/utils/remap'
 import random from '@/utils/random'
 
+let appWidth = 0
 let pages = 7
-let W = 520 * pages
+let W = appWidth * pages
 let H = 200
 
 class Chart {
@@ -11,28 +12,27 @@ class Chart {
 
 		paper.setup(canvas)
 
+		appWidth = Math.min(520, window.innerWidth)
 		paper.view.viewSize.width = W
 		paper.view.viewSize.height = H
+
+		window.addEventListener('resize', () => this.setSize())
 
 		this.font = font
 		this.bgColor = bgColor
 		this.fillColor = fillColor
-		
-		this.init(this.W, this.H)
 	}
 
-	init() {
-		// this.background = paper.Path.Rectangle({
-		// 	rectangle: paper.view.bounds,
-		// 	fillColor: this.bgColor,
-		// })
+	setSize() {
+		appWidth = Math.min(520, window.innerWidth)
 
-		// this.chart = new paper.Group([ this.plot, ...this.labels ])
-		// this.chart.pivot = new paper.Point(0, this.H)
+		this.update(this.data)
 	}
 
 	update(data) {
-		let points = this.convert(data)
+		this.data = data
+
+		let points = this.convert(this.data)
 
 		W = points[points.length - 1].x
 
@@ -40,7 +40,7 @@ class Chart {
 
 		if (this.plot) this.plot.remove()
 		if (this.labels) this.labels.forEach(label => label.remove())
-		if (this.dividers) this.labels.forEach(divider => divider.remove())
+		if (this.dividers) this.dividers.forEach(divider => divider.remove())
 
 		this.plot = new paper.Path({
 			segments: [
@@ -86,7 +86,7 @@ class Chart {
 
 			let divider = new paper.Path({
 				segments: [[ points[i].x - 1, points[i].y ], [ points[i].x - 1, H ]],
-				strokeColor: '#FFF',
+				strokeColor: this.font.color,
 				dashArray: [5, 5],
 			})
 
@@ -108,12 +108,12 @@ class Chart {
 
 		let points = data.reduce((points, day, i) => {
 
-			step = 520 / (day.length)
+			step = appWidth / (day.length)
 
 			return [
 				...points,
 				...day.map((temp, j) => ({
-					x: i * 520 + j * step,
+					x: i * appWidth + j * step,
 					y: H - remap(temp, min, max, range[0], range[1]),
 					content: temp + '°',
 				}))
@@ -129,8 +129,6 @@ class Chart {
 				content: '🤔',
 			})
 		}
-
-		console.log(points)
 
 		return points
 	}

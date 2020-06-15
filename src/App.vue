@@ -21,7 +21,7 @@ en:
 			:title="$t('units')"
 		/>
 		<search ref="search"/>
-		<widget v-if="daily"/>
+		<widget v-if="forecast"/>
 	</div>
 
 	<ui-switch
@@ -83,7 +83,7 @@ export default {
 			language: state => state.language,
 			coords: state => state.coords,
 			units: state => state.units,
-			daily: state => state.forecast.daily,
+			forecast: state => state.forecast,
 		}),
 	},
 	watch: {
@@ -101,6 +101,11 @@ export default {
 <style lang="scss">
 @import './styles/reset.css';
 @import './styles/fonts.css';
+@import '@/styles/variables';
+
+:root {
+	--width: #{$app-width};
+}
 
 @media (prefers-reduced-motion: reduce) {
 	* {
@@ -125,7 +130,7 @@ body {
 	max-width: var(--width);
 	margin: 100px auto;
 
-	@media (min-width: 500px) {
+	@media (min-width: $app-width) {
 		margin: auto;
 	}
 }
@@ -133,10 +138,10 @@ body {
 .units {
 	margin-top: -44px;
 	margin-left: auto;
-	margin-right: 5px;
+	margin-right: 4px;
 	margin-bottom: 15px;
 
-	@media (min-width: 500px) {
+	@media (min-width: $app-width) {
 		margin-right: 0;
 	}
 }
@@ -144,15 +149,19 @@ body {
 .language {
 	position: absolute !important;
 	bottom: 10px;
-	right: 5px;
+	right: 4px;
 
-	span {
-		font-size: 16px !important;
-	}
-
-	@media (min-width: 500px) {
+	@media (min-width: $app-width) {
 		bottom: 20px;
 		right: 20px;
+	}
+
+	span {
+		font-size: 12px !important;
+
+		@media (min-width: $app-width) {
+			font-size: 16px !important;
+		}
 	}
 }
 
@@ -169,7 +178,7 @@ body {
 	border-right: none;
 	box-shadow: none;
 
-	@media (min-width: 500px) {
+	@media (min-width: $app-width) {
 		border: 2px solid;
 		border-radius: var(--radius);
 	}
@@ -180,7 +189,7 @@ body {
 }
 
 .pac-item {
-	padding-left: 11px;
+	padding-left: 9px;
 	font-size: 24px;
 	line-height: 1.95em;
 	color: inherit;
@@ -188,17 +197,17 @@ body {
 	border-top: 1px solid rgba(#000, .1);
 	cursor: pointer;
 
-	@media (min-width: 500px) {
+	@media (min-width: $app-width) {
 		padding-left: 14px;
 	}
 }
 
 .pac-item-selected {
-	border-top-color: #FFCD01 !important;
-	background-color: #FFCD01 !important;
+	border-top-color: var(--color-accent) !important;
+	background-color: var(--color-accent) !important;
 
 	&+.pac-item {
-		border-top-color: #FFCD01 !important;
+		border-top-color: var(--color-accent) !important;
 	}
 
 	.pac-item-query + span {
@@ -207,11 +216,11 @@ body {
 }
 
 .pac-item:hover {
-	background-color: var(--color-bg);
-	border-top-color: var(--color-bg);
+	background-color: var(--color-accent);
+	border-top-color: var(--color-accent);
 
 	&+.pac-item {
-		border-top-color: var(--color-bg);
+		border-top-color: var(--color-accent);
 	}
 }
 
@@ -229,14 +238,5 @@ body {
 .pac-icon {
 	display: none;
 }
-
-</style>
-
-
-<style lang="postcss">
-
-/* body::after {
-	background: linear-gradient(to top, #F0F0F0, cubic-bezier(1, 0, 1, 0), transparent);
-} */
 
 </style>

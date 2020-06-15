@@ -13,7 +13,7 @@
 
 ### Todo
 - [x] google places autocomplete on search
-- [ ] forecast chart
+- [x] forecast chart
 - [x] language autodetect
 - [x] i18n
 - [x] en/ru switch

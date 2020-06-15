@@ -7,12 +7,12 @@ en:
 
 
 <template>
-<div id="search">
+<section id="search">
 	<input type="text" v-model="query" ref="input">
 	<button @click="locate" :disabled="loading" :title="$t('location')" ref="button">
 		<img src="@/assets/images/pin.svg" role="presentation">
 	</button>
-</div>
+</section>
 </template>
 
 
@@ -131,6 +131,7 @@ export default {
 
 
 <style lang="scss" scoped>
+@import '@/styles/variables';
 
 #search {
 	position: relative;
@@ -139,7 +140,7 @@ export default {
 	border-radius: var(--radius);
 	backdrop-filter: blur(4px);
 
-	@media (min-width: 500px) {
+	@media (min-width: $app-width) {
 		margin-bottom: 15px;
 		padding-right: 2px;
 	}
@@ -157,7 +158,7 @@ export default {
 		box-sizing: border-box;
 		pointer-events: none;
 
-		@media (min-width: 500px) {
+		@media (min-width: $app-width) {
 			border-radius: var(--radius);
 			border: 2px solid;
 		}
@@ -167,13 +168,13 @@ export default {
 input {
 	width: 100%;
 	height: 50px;
-	padding-left: 10px;
+	padding-left: 8px;
 	font-size: 24px;
 	font-weight: 700;
 	text-overflow: ellipsis;
 	box-sizing: border-box;
 
-	@media (min-width: 500px) {
+	@media (min-width: $app-width) {
 		padding-left: 16px;
 	}
 }
@@ -183,23 +184,22 @@ input::selection {
 }
 
 button {
+	flex-shrink: 0;
 	position: relative;
-	width: 50px;
+	width: 40px;
 	height: 50px;
 	user-select: none;
-	animation-name: zoom;
-	animation-duration: .75s;
-	animation-timing-function: ease-in-out;
-	animation-direction: alternate;
-	animation-iteration-count: infinite;
-	animation-play-state: paused;
 
-	&:disabled {
+	@media (min-width: $app-width) {
+		width: 50px;
+	}
+
+	&:disabled img {
 		animation-play-state: running;
 		pointer-events: none;
 	}
 
-	&.error {
+	&.error img {
 		animation: shake .4s;
 	}
 
@@ -211,6 +211,12 @@ button {
 		bottom: 0;
 		margin: auto;
 		width: 32px;
+		animation-name: zoom;
+		animation-duration: .75s;
+		animation-timing-function: ease-in-out;
+		animation-direction: alternate;
+		animation-iteration-count: infinite;
+		animation-play-state: paused;
 	}
 }
 
