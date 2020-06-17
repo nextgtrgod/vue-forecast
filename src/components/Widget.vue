@@ -7,6 +7,7 @@
 			<forecast
 				v-for="(day, i) in days"
 				:date="day.date"
+				:weather_id="day.weather_id"
 				:key="i"
 			/>
 			<forecast :date="lastDate" />
@@ -65,6 +66,7 @@ export default {
 					font: {
 						family: font,
 						size: 16,
+						size_accent: 28,
 						color: rootStyle.getPropertyValue('--color-text'),
 					},
 					bgColor: 	rootStyle.getPropertyValue('--color-bg'),
@@ -85,6 +87,7 @@ export default {
 			days: state => (
 				state.forecast.daily.map(day => ({
 					date: convert.date(day.dt),
+					weather_id: day.weather[0].id,
 					temp: ['morn', 'day', 'eve', 'night'].map(daytime => 
 						convert.temp(day.temp[daytime])
 					)
@@ -123,9 +126,9 @@ export default {
 
 #widget {
 	position: relative;
-	height: 375px;
+	height: 385px;
 	color: var(--color-text);
-	background: linear-gradient(to bottom, var(--color-bg) 280px, var(--color-chart) 281px);
+	background: linear-gradient(to bottom, var(--color-bg) 290px, var(--color-chart) 291px);
 	overflow: hidden;
 	-webkit-mask-image: -webkit-radial-gradient(white, black);
 	user-select: none;

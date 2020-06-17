@@ -11,9 +11,9 @@
   xml:space="preserve"
 >
   <style type="text/css">
-      svg{
+      <!-- svg{
           shape-rendering: geometricPrecision
-      }
+      } -->
 
       g, path, circle, rect{
           transform-origin: 50% 50%;

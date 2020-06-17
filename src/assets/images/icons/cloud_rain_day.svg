@@ -8,9 +8,9 @@
   xml:space="preserve"
 >
   <style>
-    svg{
+    <!-- svg{
       shape-rendering: geometricPrecision;
-    }
+    } -->
 
     g, path, circle, rect{
       transform-box: fill-box;

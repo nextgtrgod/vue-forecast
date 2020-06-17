@@ -16,13 +16,7 @@ let draw = (ctx, dots = [], { W, H, threshold }) => {
 
 	for (i = 0; i < dots.length; i++) {
 
-		// check viewport collisions
-		if (dots[i].x - dots[i].r <= 0 && dots[i].s.x <= 0) dots[i].s.x *= -1
-		else if (dots[i].x + dots[i].r >= W && dots[i].s.x >= 0) dots[i].s.x *= -1
-
-		if (dots[i].y - dots[i].r <= 0 && dots[i].s.y <= 0) dots[i].s.y *= -1
-		else if (dots[i].y + dots[i].r >= H && dots[i].s.y >= 0) dots[i].s.y *= -1
-
+		dots[i].update(W, H)
 
 		// draw lines between
 		for (j = 0; j < dots.length; j++) {
@@ -32,11 +26,11 @@ let draw = (ctx, dots = [], { W, H, threshold }) => {
 			distance = getDistance(dots[i].x, dots[i].y, dots[j].x, dots[j].y)
 
 			// if (distance < dots[i].r + dots[j].r) {
-			// 	dots[i].s.x *= -1
-			// 	// dots[i].s.y *= -1
+			// 	dots[i].v.x *= -1
+			// 	// dots[i].v.y *= -1
 
-			// 	dots[j].s.x *= -1
-			// 	// dots[j].s.y *= -1
+			// 	dots[j].v.x *= -1
+			// 	// dots[j].v.y *= -1
 
 			// 	continue
 			// }
@@ -53,10 +47,6 @@ let draw = (ctx, dots = [], { W, H, threshold }) => {
 				ctx.stroke()
 			}
 		}
-
-		// move them
-		dots[i].x += dots[i].s.x
-		dots[i].y += dots[i].s.y
 
 		ctx.beginPath()
 		ctx.fillStyle = '#000'

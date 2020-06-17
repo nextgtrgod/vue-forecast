@@ -13,7 +13,10 @@ ru:
 
 <template>
 <li class="forecast">
-	<h3>{{ $d(date, 'weekday') }}</h3>
+	<h3>
+		<span>{{ $d(date, 'weekday') }}</span>
+		<icon v-if="weather_id" :id="weather_id"/>
+	</h3>
 	<h4>{{ $d(date, 'date') }}</h4>
 	<ul class="daytimes">
 		<li v-for="(daytime, i) in daytimes" :key="i">
@@ -25,12 +28,20 @@ ru:
 
 
 <script>
+import Icon from '@/components/Icon'
+
 export default {
 	name: 'Forecast',
+	components: {
+		Icon,
+	},
 	props: {
 		date: {
 			type: Number,
 			required: true,
+		},
+		weather_id: {
+			type: Number,
 		}
 	},
 	data: () => ({
@@ -65,8 +76,16 @@ export default {
 }
 
 h3 {
+	display: flex;
+	align-items: center;
 	padding-left: 10px;
 	font-size: 42px;
+	height: 50px;
+
+	div {
+		position: relative;
+		top: 6px;
+	}
 }
 
 h4 {

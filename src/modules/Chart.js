@@ -73,7 +73,7 @@ class Chart {
 			if (i % 4 === 0) offset = 12
 
 			if ((i + 3) % 4 === 0) {
-				label.fontSize = 28
+				label.fontSize = this.font.size_accent
 				offset = -2
 			}
 
@@ -98,7 +98,7 @@ class Chart {
 	convert(data) {
 		let range = [
 			H / 6,
-			H - 2 * this.font.size,
+			H - 1.45 * this.font.size_accent,
 		]
 
 		let flat_data = data.flat()

@@ -32,6 +32,8 @@ export default {
 	setForecast: (state, data) => {
 
 		state.forecast = data
+		
+		// console.log(state.forecast)
 
 		// state.forecast = (data.list || []).reduce((groups, item) => {
 

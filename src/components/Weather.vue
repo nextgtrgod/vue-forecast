@@ -72,14 +72,6 @@ export default {
 			today: state => (state.forecast.daily || [])[0],
 		}),
 
-		daytime() {
-			let now = Date.now()
-
-			return now > (this.current.sunrise * 1000) && now < (this.current.sunset * 1000)
-				? 'day'
-				: 'night'
-		},
-
 		icon() {
 			let now = Date.now()
 

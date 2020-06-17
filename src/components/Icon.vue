@@ -18,6 +18,7 @@ export default {
 		},
 		daytime: {
 			type: String,
+			default: 'day',
 		},
 	},
 	computed: {
@@ -62,6 +63,7 @@ i {
 
 img {
 	height: 100%;
+	transform: translateZ(0);
 }
 
 </style>

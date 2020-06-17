@@ -7,6 +7,43 @@ import Worker from 'worker-loader!./worker'
 
 let PI = Math.PI
 
+class Dot {
+	constructor({ x, y, r, v }) {
+		this.x = x
+		this.y = y
+		this.r = r
+		this.v = v
+
+		this.setBounds()
+	}
+
+	checkCollision(W, H) {
+		if (this.bounds.left <= 0 && this.v.x <= 0) this.v.x *= -1
+		else if (this.bounds.right >= W && this.v.x >= 0) this.v.x *= -1
+
+		if (this.bounds.top <= 0 && this.v.y <= 0) this.v.y *= -1
+		else if (this.bounds.bottom >= H && this.v.y >= 0) this.v.y *= -1
+	}
+
+	setBounds() {
+		this.bounds = {
+			top: this.y - this.r,
+			right: this.x + this.r,
+			bottom: this.y + this.r,
+			left: this.x - this.r,
+		}
+	}
+
+	update(W, H) {
+		this.checkCollision(W, H)
+
+		this.x += this.v.x || 0
+		this.y += this.v.y || 0
+
+		this.setBounds()
+	}
+}
+
 class Sketch {
 	constructor(canvas, dpi = window.devicePixelRatio, speed = 1.5) {
 		this.canvas = canvas
@@ -42,7 +79,8 @@ class Sketch {
 			return
 		}
 
-		if ('transferControlToOffscreen' in this.canvas) {
+		// if ('transferControlToOffscreen' in this.canvas) {
+		if (false) {
 			this.worker = new Worker()
 			let offscreen = this.canvas.transferControlToOffscreen()
 
@@ -80,15 +118,15 @@ class Sketch {
 				rnd.range(1.5*PI + limit, 2*PI - limit),
 			])
 
-			dots[i] = {
+			dots[i] = new Dot({
 				x: rnd.range(0, W),
 				y: rnd.range(0, H),
-				r: rnd.range(6, 15) * dpi,
-				s: {
+				r: rnd.range(6, 10) * dpi,
+				v: {
 					x: s * Math.cos(angle),
 					y: s * Math.sin(angle),
 				},
-			}
+			})
 		}
 
 		return dots
