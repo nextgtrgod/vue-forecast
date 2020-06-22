@@ -1,5 +1,4 @@
 import i18n from '@/config/i18n'
-import formatDate from '@/utils/formatDate'
 
 export default {
 	setLanguage: (state, data) => {
@@ -15,8 +14,6 @@ export default {
 	setCoords: (state, data) => {
 		state.coords = data
 
-		document.title = state.coords.name
-
 		localStorage.setItem('coords', JSON.stringify({
 			latitude: state.coords.latitude,
 			longitude: state.coords.longitude,
@@ -25,25 +22,18 @@ export default {
 
 	setUnits: (state, data) => {
 		state.units = data
-
 		localStorage.setItem('units', state.units)
 	},
 
 	setForecast: (state, data) => {
-
 		state.forecast = data
-		
-		// console.log(state.forecast)
+	},
 
-		// state.forecast = (data.list || []).reduce((groups, item) => {
+	setCity: (state, data) => {
+		if (!data) return
 
-		// 	let key = formatDate(item.dt * 1000)
-
-		// 	;(groups[key] = groups[key] || []).push(item)
-
-		// 	return groups
-		// }, {})
-
-		// state.last_update = Date.now()
-	},	
+		state.city = data
+		document.title = state.city
+		localStorage.setItem('city', state.city)
+	}
 }

@@ -94,11 +94,11 @@ export default {
 					if (!status === 'OK' || !results) return reject()
 
 					let city = results.find(r => r.types.includes('locality'))
-	
+
 					if (!city) return reject()
 	
-					document.title = city.formatted_address
 					this.query = city.formatted_address
+					this.$store.commit('setCity', city.formatted_address)
 
 					resolve()
 				})
@@ -113,11 +113,8 @@ export default {
 			let latitude = place.geometry.location.lat()
 			let longitude = place.geometry.location.lng()
 
-			this.$store.commit('setCoords', {
-				latitude,
-				longitude,
-				name: place.formatted_address,
-			})
+			this.$store.commit('setCoords', { latitude, longitude })
+			this.$store.commit('setCity', place.formatted_address)
 		},
 	},
 	computed: {

@@ -65,4 +65,4 @@ let draw = (ctx, { W, H }) => {
 	}
 }
 
-export { draw, create }
+export { create, draw }

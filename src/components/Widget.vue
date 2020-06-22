@@ -25,16 +25,10 @@ import Weather from '@/components/Weather'
 import Forecast from '@/components/Forecast'
 
 import convert from '@/utils/convert'
-// import { Tween, autoPlay } from 'es6-tween'
+import loadFont from '@/utils/loadFont'
+
 import Chart from '@/modules/Chart'
 
-let formatDate = t => {
-	let d = new Date(t)
-
-	return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()).getTime()
-}
-
-// autoPlay(true)
 
 export default {
 	name: 'Widget',
@@ -59,7 +53,7 @@ export default {
 			let font = 'jura'
 			let rootStyle = getComputedStyle(document.documentElement)
 
-			this.preload(font).then(() => {
+			loadFont(`1em ${font}`).then(() => {
 
 				this.chart = new Chart({
 					canvas: this.$refs['canvas'],
@@ -75,15 +69,10 @@ export default {
 				this.chart.update(this.values)
 			})
 		},
-
-		preload: font => new Promise(resolve => {
-			if (!('fonts' in document)) return resolve()
-
-			document.fonts.load(`1em ${font}`).then(resolve)
-		}),
 	},
 	computed: {
 		...mapState({
+			forecast: state => state.forecast,
 			days: state => (
 				state.forecast.daily.map(day => ({
 					date: convert.date(day.dt),

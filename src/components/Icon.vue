@@ -23,13 +23,8 @@ export default {
 	},
 	computed: {
 		...mapState({
-			reducedMotion: state => state.reducedMotion,
-			browser: state => state.browser,
+			animation: state => state.browser === 'chrome' && !state.reducedMotion,
 		}),
-
-		animation() {
-			return !this.reducedMotion && this.browser === 'chrome'
-		},
 
 		icon() {
 			if (!this.animation) return `wi wi-owm-${this.daytime}-${this.id}`

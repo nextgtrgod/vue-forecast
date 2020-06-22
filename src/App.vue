@@ -12,8 +12,6 @@ en:
 <main id="app">
 	<background/>
 
-	<!-- <map-view/> -->
-
 	<div class="center">
 		<ui-switch
 			class="units"
@@ -23,7 +21,9 @@ en:
 			:title="$t('units')"
 		/>
 		<search ref="search"/>
-		<widget v-if="forecast"/>
+		<transition-group name="fade" class="widget-wrap">
+			<widget v-if="forecast" key="widget"/>
+		</transition-group>
 	</div>
 
 	<ui-switch
@@ -42,7 +42,6 @@ import { mapState } from 'vuex'
 import API from '@/config'
 
 import Background from '@/components/Background'
-// import MapView from '@/components/Map'
 import Search from '@/components/Search'
 import Widget from '@/components/Widget'
 import uiSwitch from '@/components/Switch'
@@ -52,7 +51,6 @@ export default {
 	name: 'App',
 	components: {
 		Background,
-		// MapView,
 		Search,
 		Widget,
 		uiSwitch,
@@ -106,6 +104,7 @@ export default {
 @import './styles/reset.css';
 @import './styles/fonts.css';
 @import '@/styles/variables';
+@import '@/styles/mixins';
 
 :root {
 	--width: #{$app-width};
@@ -167,6 +166,13 @@ body {
 			font-size: 16px !important;
 		}
 	}
+}
+
+
+@include transition(fade, .4s);
+
+.widget-wrap {
+	min-height: 385px;
 }
 
 

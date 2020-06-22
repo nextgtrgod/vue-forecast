@@ -1,0 +1,18 @@
+
+@mixin transition(
+	$name: fade,
+	$duration: .2s,
+	$property: opacity,
+	$value: 0
+) {
+
+	.#{$name}-enter-active,
+	.#{$name}-leave-active {
+		transition: $property $duration;
+	}
+	
+	.#{$name}-enter,
+	.#{$name}-leave-to {
+		#{$property}: $value;
+	}
+}

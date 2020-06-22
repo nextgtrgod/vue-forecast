@@ -10,8 +10,7 @@ import Sketch from '@/modules/Sketch'
 export default {
 	name: 'Background',
 	mounted() {
-		if (!this.reducedMotion)
-			this.sketch = new Sketch(this.$el, 2, 2)
+		if (!this.reducedMotion) this.sketch = new Sketch(this.$el)
 	},
 	computed: {
 		...mapState({

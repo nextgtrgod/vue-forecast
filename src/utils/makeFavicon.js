@@ -1,7 +1,10 @@
+import loadFont from '@/utils/loadFont'
 
 let color = window.matchMedia('(prefers-color-scheme: dark)').matches ? '#FFF' : '#000'
 
-let makeFavicon = (text, font) => {
+let makeFavicon = async (text, font) => {
+	await loadFont(font)
+
 	let canvas = document.createElement('canvas')
 	canvas.width = 128
 	canvas.height = 128

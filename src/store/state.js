@@ -1,4 +1,5 @@
 import i18n from '@/config/i18n'
+import { units } from '@/config/settings'
 import checkBrowser from '@/utils/checkBrowser'
 
 const browser = checkBrowser()
@@ -6,6 +7,7 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 
 document.documentElement.classList.add(browser)
 
+// load static icons
 if (reducedMotion || browser !== 'chrome') {
 	let link = document.createElement('link')
 	link.rel = 'stylesheet'
@@ -21,10 +23,6 @@ try {
 	console.warn('Error reading localStorage:', error)
 }
 
-let units = ['metric', 'imperial'].find(type => (
-	type === localStorage.getItem('units')
-)) || 'metric'
-
 
 export default {
 	browser,
@@ -32,10 +30,7 @@ export default {
 
 	coords,
 	language: i18n.locale,
-	units,
+	units: units.initial,
 
-	// city: {},
 	forecast: null,
-
-	last_update: null,
 }
