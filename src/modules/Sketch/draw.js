@@ -1,59 +1,69 @@
+import rnd from '@/utils/random'
+import Dot from './Dot'
 
-let getDistance = (x1, y1, x2, y2) => Math.hypot( abs(x2 - x1), abs(y2 - y1) )
-
-const random = Math.random
-const abs = Math.abs
 const PI = Math.PI
 
 let i = 0
-let j = 0
-let distance = 0
+let threshold = 0
 
-let draw = (ctx, dots = [], { W, H, threshold }) => {
+let dots = []
+let create = (W, H, dpi) => {
+
+	dots = []
+
+	let count = 24
+	let speed = 2
+	threshold = W / 5
+
+	for (i = 1; i <= count; i++) {
+
+		let s = rnd.range(.5, speed) * dpi
+
+		let limit = PI/12
+		let angle = rnd.from([
+			rnd.range(limit, PI/2 - limit),
+			rnd.range(PI/2 + limit, PI - limit),
+			rnd.range(PI + limit, 1.5*PI - limit),
+			rnd.range(1.5*PI + limit, 2*PI - limit),
+		])
+
+		dots.push(
+			new Dot({
+				id: i,
+				x: rnd.range(0, W),
+				y: rnd.range(0, H),
+				r: rnd.range(6, 10) * dpi,
+				v: {
+					x: s * Math.cos(angle),
+					y: s * Math.sin(angle),
+				},
+			})
+		)
+	}
+}
+
+let draw = (ctx, { W, H }) => {
 
 	ctx.fillStyle = '#F0F0F0'
 	ctx.fillRect(0, 0, W, H)
 
 	for (i = 0; i < dots.length; i++) {
 
-		dots[i].update(W, H)
+		dots[i].update(ctx, W, H, dots, threshold)
 
-		// draw lines between
-		for (j = 0; j < dots.length; j++) {
-
-			if (j === i) continue
-
-			distance = getDistance(dots[i].x, dots[i].y, dots[j].x, dots[j].y)
-
-			// if (distance < dots[i].r + dots[j].r) {
-			// 	dots[i].v.x *= -1
-			// 	// dots[i].v.y *= -1
-
-			// 	dots[j].v.x *= -1
-			// 	// dots[j].v.y *= -1
-
-			// 	continue
-			// }
-
-			if (distance < threshold) {
+		Object.values(dots[i].links).forEach(({ line }) => {
+			if (line) {
 				ctx.beginPath()
-				ctx.moveTo(dots[i].x, dots[i].y)
-				ctx.lineTo(dots[j].x, dots[j].y)
+				ctx.moveTo(line.from.x, line.from.y)
+				ctx.lineTo(line.to.x, line.to.y)
 
-				ctx.strokeStyle = `rgba(0, 0, 0, ${(threshold - distance) / 10})`
-
-				ctx.lineWidth = Math.min((threshold / distance), Math.min(dots[i].r, dots[j].r))
-
+				// ctx.strokeStyle = `rgba(0, 0, 0, ${(threshold - distance) / 10})`
+				ctx.strokeStyle = '#000'
+				// ctx.lineWidth = Math.min((threshold / distance), Math.min(dots[i].r, dots[j].r))
 				ctx.stroke()
 			}
-		}
-
-		ctx.beginPath()
-		ctx.fillStyle = '#000'
-
-		ctx.arc(dots[i].x, dots[i].y, dots[i].r, 0, 2 * PI)
-		ctx.fill()
+		})
 	}
 }
 
-export default draw
+export { draw, create }

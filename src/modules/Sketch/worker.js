@@ -1,29 +1,28 @@
-
-import draw from './draw'
+import { create, draw } from './draw'
 
 self.radId = null
 self.canvas = null
 
 onmessage = e => {
-	let { canvas, data, options } = e.data
+	let { canvas, options } = e.data
+	let { W, H, dpi } = options
 
 	if (canvas) self.canvas = canvas
 
-	self.canvas.width = options.W
-	self.canvas.height = options.H
+	self.canvas.width = W
+	self.canvas.height = H
 
-	// let ctx = self.canvas.getContext('2d', { alpha: false, desynchronized: true })
-	let ctx = self.canvas.getContext('2d', { alpha: false })
-
-	ctx.fillStyle = '#0f0'
+	let ctx = self.canvas.getContext('2d', { alpha: false, desynchronized: true })
 
 	cancelAnimationFrame(self.radId)
 
-	self.rafId = self.update(ctx, data, options)
+	create(W, H, dpi)
+
+	self.rafId = self.update(ctx, options)
 }
 
 self.update = (...args) => {
-	// self.radId = requestAnimationFrame(() => update(...args))
+	self.radId = requestAnimationFrame(() => update(...args))
 
 	draw(...args)
 }

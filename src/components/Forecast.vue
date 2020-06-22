@@ -5,10 +5,10 @@ en:
  evening: "evening"
  night: "night"
 ru:
- morning: "утром"
- day: "днем"
- evening: "вечером"
- night: "ночью"
+ morning: "утро"
+ day: "день"
+ evening: "вечер"
+ night: "ночь"
 </i18n>
 
 <template>

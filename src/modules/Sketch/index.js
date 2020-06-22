@@ -2,47 +2,10 @@ import rnd from '@/utils/random'
 
 // import getGpu from '@/utils/getGpu'
 
-import draw from './draw'
+import { create, draw } from './draw'
 import Worker from 'worker-loader!./worker'
 
 let PI = Math.PI
-
-class Dot {
-	constructor({ x, y, r, v }) {
-		this.x = x
-		this.y = y
-		this.r = r
-		this.v = v
-
-		this.setBounds()
-	}
-
-	checkCollision(W, H) {
-		if (this.bounds.left <= 0 && this.v.x <= 0) this.v.x *= -1
-		else if (this.bounds.right >= W && this.v.x >= 0) this.v.x *= -1
-
-		if (this.bounds.top <= 0 && this.v.y <= 0) this.v.y *= -1
-		else if (this.bounds.bottom >= H && this.v.y >= 0) this.v.y *= -1
-	}
-
-	setBounds() {
-		this.bounds = {
-			top: this.y - this.r,
-			right: this.x + this.r,
-			bottom: this.y + this.r,
-			left: this.x - this.r,
-		}
-	}
-
-	update(W, H) {
-		this.checkCollision(W, H)
-
-		this.x += this.v.x || 0
-		this.y += this.v.y || 0
-
-		this.setBounds()
-	}
-}
 
 class Sketch {
 	constructor(canvas, dpi = window.devicePixelRatio, speed = 1.5) {
@@ -66,28 +29,19 @@ class Sketch {
 	init() {
 		let W = window.innerWidth * this.dpi
 		let H = window.innerHeight * this.dpi
-		let count = ~~(window.innerWidth / (window.innerWidth < 720 ? 25 : 80))
-		let speed = this.speed
-		let threshold = W / 3
-		let dots = this.createDots(count, speed, W, H, this.dpi)
 
-		if (this.worker) {
-			this.worker.postMessage({
-				data: dots,
-				options: { W, H, threshold },
-			})
-			return
-		}
+		let options = { W, H, dpi: this.dpi }
 
-		// if ('transferControlToOffscreen' in this.canvas) {
-		if (false) {
+		if (this.worker)
+			return this.worker.postMessage({ options })
+
+		if ('transferControlToOffscreen' in this.canvas) {
 			this.worker = new Worker()
 			let offscreen = this.canvas.transferControlToOffscreen()
 
 			this.worker.postMessage({
 				canvas: offscreen,
-				data: dots,
-				options: { W, H, threshold },
+				options,
 			}, [offscreen])
 
 		} else {
@@ -98,15 +52,14 @@ class Sketch {
 
 			let ctx = this.canvas.getContext('2d', { alpha: false, desynchronized: true })
 
-			this.update(ctx, dots, { W, H, threshold })
+			this.update(ctx, options)
 		}
 	}
 
 	createDots(count, speed, W, H, dpi) {
 		let dots = []
-		dots.length = count
 	
-		for (let i = 0; i < dots.length; i++) {
+		for (let i = 0; i < count; i++) {
 
 			let s = rnd.range(.5, speed) * dpi
 
@@ -118,7 +71,7 @@ class Sketch {
 				rnd.range(1.5*PI + limit, 2*PI - limit),
 			])
 
-			dots[i] = new Dot({
+			dots.push({
 				x: rnd.range(0, W),
 				y: rnd.range(0, H),
 				r: rnd.range(6, 10) * dpi,

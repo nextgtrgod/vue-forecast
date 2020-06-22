@@ -12,6 +12,8 @@ en:
 <main id="app">
 	<background/>
 
+	<!-- <map-view/> -->
+
 	<div class="center">
 		<ui-switch
 			class="units"
@@ -40,6 +42,7 @@ import { mapState } from 'vuex'
 import API from '@/config'
 
 import Background from '@/components/Background'
+// import MapView from '@/components/Map'
 import Search from '@/components/Search'
 import Widget from '@/components/Widget'
 import uiSwitch from '@/components/Switch'
@@ -49,6 +52,7 @@ export default {
 	name: 'App',
 	components: {
 		Background,
+		// MapView,
 		Search,
 		Widget,
 		uiSwitch,
@@ -237,6 +241,12 @@ body {
 
 .pac-icon {
 	display: none;
+}
+
+
+// mapbox
+.mapboxgl-ctrl-logo {
+	display: none !important;
 }
 
 </style>
