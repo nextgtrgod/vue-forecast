@@ -1,17 +1,12 @@
-import rnd from '@/utils/random'
-
 // import getGpu from '@/utils/getGpu'
 
 import { create, draw } from './draw'
 import Worker from 'worker-loader!./worker'
 
-let PI = Math.PI
-
 class Sketch {
-	constructor(canvas, dpi = window.devicePixelRatio, speed = 1.5) {
+	constructor(canvas) {
 		this.canvas = canvas
-		this.dpi = dpi
-		this.speed = speed
+		this.dpi = window.devicePixelRatio
 
 		// let gpu = getGpu()
 		// console.log(gpu)
@@ -50,39 +45,10 @@ class Sketch {
 
 			cancelAnimationFrame(this.radId)
 
-			let ctx = this.canvas.getContext('2d', { alpha: false, desynchronized: true })
-
+			let ctx = this.canvas.getContext('2d', { alpha: false })
+			create(options)
 			this.update(ctx, options)
 		}
-	}
-
-	createDots(count, speed, W, H, dpi) {
-		let dots = []
-	
-		for (let i = 0; i < count; i++) {
-
-			let s = rnd.range(.5, speed) * dpi
-
-			let limit = PI/12
-			let angle = rnd.from([
-				rnd.range(limit, PI/2 - limit),
-				rnd.range(PI/2 + limit, PI - limit),
-				rnd.range(PI + limit, 1.5*PI - limit),
-				rnd.range(1.5*PI + limit, 2*PI - limit),
-			])
-
-			dots.push({
-				x: rnd.range(0, W),
-				y: rnd.range(0, H),
-				r: rnd.range(6, 10) * dpi,
-				v: {
-					x: s * Math.cos(angle),
-					y: s * Math.sin(angle),
-				},
-			})
-		}
-
-		return dots
 	}
 
 	update(...args) {

@@ -7,15 +7,15 @@ let i = 0
 let threshold = 0
 
 let dots = []
-let create = (W, H, dpi) => {
+let create = ({ W, H, dpi }) => {
 
 	dots = []
 
-	let count = 24
+	let count = 16
 	let speed = 2
-	threshold = W / 5
+	threshold = W / 3
 
-	for (i = 1; i <= count; i++) {
+	for (i = 0; i < count; i++) {
 
 		let s = rnd.range(.5, speed) * dpi
 
@@ -42,8 +42,10 @@ let create = (W, H, dpi) => {
 	}
 }
 
+let id = null
 let draw = (ctx, { W, H }) => {
 
+	// clear canvas
 	ctx.fillStyle = '#F0F0F0'
 	ctx.fillRect(0, 0, W, H)
 
@@ -51,18 +53,15 @@ let draw = (ctx, { W, H }) => {
 
 		dots[i].update(ctx, W, H, dots, threshold)
 
-		Object.values(dots[i].links).forEach(({ line }) => {
-			if (line) {
-				ctx.beginPath()
-				ctx.moveTo(line.from.x, line.from.y)
-				ctx.lineTo(line.to.x, line.to.y)
+		for (id in dots[i].lines) {
+			ctx.beginPath()
+			ctx.moveTo(dots[i].lines[id][0].x, dots[i].lines[id][0].y)
+			ctx.lineTo(dots[i].lines[id][1].x, dots[i].lines[id][1].y)
 
-				// ctx.strokeStyle = `rgba(0, 0, 0, ${(threshold - distance) / 10})`
-				ctx.strokeStyle = '#000'
-				// ctx.lineWidth = Math.min((threshold / distance), Math.min(dots[i].r, dots[j].r))
-				ctx.stroke()
-			}
-		})
+			ctx.strokeStyle = `rgba(0, 0, 0, ${dots[i].lines[id].alpha})`
+			ctx.lineWidth = dots[i].lines[id].width
+			ctx.stroke()
+		}
 	}
 }
 

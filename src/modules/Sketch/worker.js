@@ -5,18 +5,17 @@ self.canvas = null
 
 onmessage = e => {
 	let { canvas, options } = e.data
-	let { W, H, dpi } = options
 
 	if (canvas) self.canvas = canvas
 
-	self.canvas.width = W
-	self.canvas.height = H
+	self.canvas.width = options.W
+	self.canvas.height = options.H
 
 	let ctx = self.canvas.getContext('2d', { alpha: false, desynchronized: true })
 
 	cancelAnimationFrame(self.radId)
 
-	create(W, H, dpi)
+	create(options)
 
 	self.rafId = self.update(ctx, options)
 }
