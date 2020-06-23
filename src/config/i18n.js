@@ -4,10 +4,6 @@ import { language } from '@/config/settings'
 
 Vue.use(VueI18n)
 
-// if (document.documentElement.lang !== language)
-// 	document.documentElement.lang = language
-
-
 const dateTimeFormats = {
 	'en': {
 		'weekday': {
@@ -29,9 +25,8 @@ const dateTimeFormats = {
 	}
 }
 
-
 const i18n = new VueI18n({
-	locale: language.initial,
+	locale: language.current,
 	fallbackLocale: language.options[0],
 	dateTimeFormats,
 	silentFallbackWarn: true,

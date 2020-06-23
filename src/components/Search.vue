@@ -18,7 +18,7 @@ en:
 
 <script>
 import { mapState } from 'vuex'
-import API from '@/config'
+import API from '@/config/api'
 
 export default {
 	name: 'Search',
@@ -30,7 +30,9 @@ export default {
 	},
 	async mounted() {
 		await this.init()
+
 		if (!this.coords) this.locate()
+		else this.$store.dispatch('getForecast')
 	},
 	methods: {
 		init() {
@@ -108,7 +110,7 @@ export default {
 		search() {
 			let place = this.autocomplete.getPlace()
 
-			if (!place.geometry) return
+			if (!place) return
 
 			let latitude = place.geometry.location.lat()
 			let longitude = place.geometry.location.lng()
@@ -121,7 +123,17 @@ export default {
 		...mapState({
 			coords: state => state.coords,
 			language: state => state.language,
+			units: state => state.units,
 		}),
+	},
+	watch: {
+		coords(coords) {
+			this.$store.dispatch('getForecast')
+		},
+		async language() {
+			await this.init()
+			this.$store.dispatch('getForecast')
+		},
 	},
 }
 </script>

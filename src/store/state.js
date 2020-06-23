@@ -30,7 +30,7 @@ export default {
 
 	coords,
 	language: i18n.locale,
-	units: units.initial,
+	units: units.current,
 
 	forecast: null,
 }

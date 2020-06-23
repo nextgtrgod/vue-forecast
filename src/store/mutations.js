@@ -1,14 +1,11 @@
-import i18n from '@/config/i18n'
 
 export default {
 	setLanguage: (state, data) => {
 		state.language = data
+	},
 
-		i18n.locale = state.language
-
-		document.documentElement.lang = state.language
-
-		localStorage.setItem('language', state.language)
+	setUnits: (state, data) => {
+		state.units = data
 	},
 
 	setCoords: (state, data) => {
@@ -18,11 +15,6 @@ export default {
 			latitude: state.coords.latitude,
 			longitude: state.coords.longitude,
 		}))
-	},
-
-	setUnits: (state, data) => {
-		state.units = data
-		localStorage.setItem('units', state.units)
 	},
 
 	setForecast: (state, data) => {

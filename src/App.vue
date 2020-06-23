@@ -15,12 +15,12 @@ en:
 	<div class="center">
 		<ui-switch
 			class="units"
-			:value="units === 'metric'"
-			:labels="['C°', 'F°']"
-			@click.native="switchUnits"
+			:value="units.index"
+			:labels="units.labels"
+			@click.native="units.switch"
 			:title="$t('units')"
 		/>
-		<search ref="search"/>
+		<search/>
 		<transition-group name="fade" class="widget-wrap">
 			<widget v-if="forecast" key="widget"/>
 		</transition-group>
@@ -28,9 +28,9 @@ en:
 
 	<ui-switch
 		class="language"
-		:value="language === 'en'"
-		:labels="['EN', 'RU']"
-		@click.native="switchLanguage"
+		:value="language.index"
+		:labels="language.labels"
+		@click.native="language.switch"
 		:title="$t('language')"
 	/>
 </main>
@@ -39,13 +39,13 @@ en:
 
 <script>
 import { mapState } from 'vuex'
-import API from '@/config'
 
 import Background from '@/components/Background'
 import Search from '@/components/Search'
 import Widget from '@/components/Widget'
 import uiSwitch from '@/components/Switch'
 
+import { units, language } from '@/config/settings'
 
 export default {
 	name: 'App',
@@ -55,47 +55,15 @@ export default {
 		Widget,
 		uiSwitch,
 	},
-	methods: {
-		async getForecast() {
-			try {
-				let res = await fetch(API.forecast(this.coords, this.language, this.units))
-				let data = await res.json()
-
-				this.$store.commit('setForecast', data)
-
-			} catch (error) {
-				console.log(error)
-			}
-		},
-
-		switchUnits() {
-			this.$store.commit('setUnits', this.units === 'metric' ? 'imperial' : 'metric')
-		},
-
-		switchLanguage() {
-			this.$store.commit('setLanguage', this.language === 'en' ? 'ru' : 'en')
-
-			this.$refs['search']
-				.init()
-				.then(this.getForecast)
-		},
-	},
+	data: () => ({
+		units,
+		language,
+	}),
 	computed: {
 		...mapState({
-			language: state => state.language,
-			coords: state => state.coords,
-			units: state => state.units,
 			forecast: state => state.forecast,
-		}),
-	},
-	watch: {
-		coords: {
-			immediate: true,
-			handler(coords) {
-				if (coords) this.getForecast(coords)
-			},
-		},
-	},
+		})
+	}
 }
 </script>
 
