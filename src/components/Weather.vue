@@ -31,22 +31,41 @@ ru:
 <template>
 <div id="weather" :class="{ visible: today }">
 	<div class="status">
-		<icon :id="icon.id" :daytime="icon.daytime" class="icon"/>
+		<transition name="fade">
+			<icon :id="icon.id" :daytime="icon.daytime" class="icon"/>
+		</transition>
 		<h2>{{ icon.description }}</h2>
 	</div>
+
 	<div class="temp">
-		<h1 :title="$t('now')">{{ temp.current }}°</h1>
-		<span v-show="temp.current !== temp.feels">
-			{{ $t('feels-like') }} <strong>{{ temp.feels }}°</strong>
+		<number :value="temp.current">
+			<template v-slot:default="slot">
+				<h1 :title="$t('now')">{{ slot.value }}°</h1>
+			</template>
+		</number>
+
+		<span v-visible="temp.current !== temp.feels">
+			{{ $t('feels-like') }}
+			<number :value="temp.feels" tag="span">
+				<template v-slot:default="slot">
+					<strong>{{ slot.value }}°</strong>
+				</template>
+			</number>
 		</span>
-		<p>
-			{{ temp.min !== temp.max ? `${temp.min}..${temp.max}°` : null }}
+
+		<p v-visible="temp.min !== temp.max">
+			{{ `${temp.min}..${temp.max}°` }}
 		</p>
 	</div>
+
 	<ul>
 		<li v-for="(item, i) in info" :key="i" :title="item.title">
 			<img :src="item.icon" :style="item.style" alt="">
-			<span :data-units="item.units">{{ item.value }}</span>
+			<number :value="item.value">
+				<template v-slot:default="slot">
+					<span :data-units="item.units">{{ slot.value }}</span>
+				</template>
+			</number>
 		</li>
 	</ul>
 </div>
@@ -56,6 +75,7 @@ ru:
 <script>
 import { mapState } from 'vuex'
 import Icon from '@/components/Icon'
+import Number from '@/components/Number'
 
 import convert from '@/utils/convert'
 import makeFavicon from '@/utils/makeFavicon'
@@ -64,6 +84,7 @@ export default {
 	name: 'Weather',
 	components: {
 		Icon,
+		Number,
 	},
 	computed: {
 		...mapState({
@@ -144,11 +165,10 @@ export default {
 	left: 0;
 	right: 0;
 	display: flex;
-	align-items: center;
+	align-items: flex-end;
 	font-size: 16px;
 	padding: .75em 0;
 	box-sizing: border-box;
-	// pointer-events: none;
 
 	@media (min-width: 375px) {
 		font-size: 18px;
@@ -171,7 +191,7 @@ h2 {
 	display: flex;
 	align-items: flex-end;
 	margin-top: auto;
-	font-size: 1em;
+	font-size: .8em;
 	height: .8em;
 	line-height: 1;
 	text-align: right;
@@ -205,7 +225,7 @@ h2 {
 		font-size: 1em;
 	}
 
-	span {
+	&>span {
 		margin-left: 4px;
 		margin-bottom: .5em;
 		font-size: .75em;
@@ -219,7 +239,6 @@ h2 {
 	p {
 		height: 1em;
 		margin-left: 4px;
-		margin-bottom: 1em;
 	}
 }
 

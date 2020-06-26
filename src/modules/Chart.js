@@ -1,10 +1,11 @@
 import paper from 'paper'
 import remap from '@/utils/remap'
-import random from '@/utils/random'
+import { Tween, autoPlay } from 'es6-tween'
+autoPlay(true)
 
 let appWidth = 0
-let pages = 7
-let W = appWidth * pages
+let days = 8
+let W = appWidth * days
 let H = 100
 
 class Chart {
@@ -21,26 +22,26 @@ class Chart {
 		this.font = font
 		this.bgColor = bgColor
 		this.fillColor = fillColor
+
+		this.init()
 	}
 
 	setSize() {
 		appWidth = Math.min(520, window.innerWidth)
 
-		this.update(this.data)
+		// this.update(this.data)
 	}
 
-	update(data) {
-		this.data = data
-
-		let points = this.convert(this.data)
-
-		W = points[points.length - 1].x
-
+	init() {
+		W = appWidth * days
 		paper.view.viewSize.width = W
 
 		if (this.plot) this.plot.remove()
 		if (this.labels) this.labels.forEach(label => label.remove())
-		// if (this.dividers) this.dividers.forEach(divider => divider.remove())
+
+		let data = new Array(8).fill( new Array(4).fill(-99) )
+
+		let points = this.convert(data)
 
 		this.plot = new paper.Path({
 			segments: [
@@ -50,11 +51,7 @@ class Chart {
 			],
 			fillColor: this.fillColor,
 		})
-		this.plot.smooth({
-			// type: 'catmull-rom',
-			// factor: .1,
-			from: 2,
-		})
+		this.plot.smooth()
 
 		this.labels = []
 		for (let i = 0; i < points.length; i++) {
@@ -72,33 +69,37 @@ class Chart {
 
 			if (i % 4 === 0) offset = 12
 
-			if ((i + 3) % 4 === 0) {
-				label.fontSize = this.font.size_accent
-				offset = -2
-			}
+			// if ((i + 3) % 4 === 0) {
+			// 	label.fontSize = this.font.size_accent
+			// 	offset = -2
+			// }
 
 			label.position = new paper.Point(points[i].x + offset, points[i].y)
 
 			this.labels.push(label)
 		}
 
-		// this.dividers = []
-		// for (let i = 0; i < points.length; i+=4) {
+		this.prev = points
+	}
 
-		// 	let divider = new paper.Path({
-		// 		segments: [[ points[i].x - 1, H ], [ points[i].x - 1, 20 ]],
-		// 		strokeColor: this.font.color,
-		// 		dashArray: [3, 2],
-		// 	})
+	update(data) {
+		let next = this.convert(data)
 
-		// 	this.dividers.push(divider)
-		// }
+		this.animate(next, this.prev)
+
+		// this.data = data
+
+		// let points = this.convert(this.data)
+
+		// W = points[points.length - 1].x
+
+		// paper.view.viewSize.width = W
 	}
 
 	convert(data) {
 		let range = [
 			H / 6,
-			H - 1.45 * this.font.size_accent,
+			H - 2 * this.font.size,
 		]
 
 		let flat_data = data.flat()
@@ -116,38 +117,41 @@ class Chart {
 				...day.map((temp, j) => ({
 					x: i * appWidth + j * step,
 					y: H - remap(temp, min, max, range[0], range[1]),
-					content: temp + '°',
+					content: temp,
 				}))
 			]
 
 		}, [])
 
 		// finish chart
-		for (let i = 0; i < 4; i++) {
-			points.push({
-				x: points[points.length - 1].x + step,
-				y: H - remap(random.range(min, max), min, max, range[0], range[1]),
-				content: '🤔',
-			})
-		}
-
 		points.push({
-			...points[points.length - 1],
 			x: points[points.length - 1].x + step,
+			y: points[points.length - 1].y,
+			content: 0,
 		})
 
 		return points
 	}
 
-	// scroll(direction) {
-	// 	let offset = this.chart.position.x + 520 * direction
+	animate(next) {
+		if (this.tween && this.tween.isPlaying())
+			this.tween.stop()
 
-	// 	console.log(offset)
-		
-	// 	if (offset > 0 || offset < -this.W) return
-
-	// 	let tween = this.chart.tweenTo({ 'position.x': offset }, { duration: 400, easing: 'easeInOutCubic' })
-	// }
+		let i = 0
+		this.tween = new Tween({ points: this.prev })
+			.to({ points: next }, 2500)
+			.on('update', ({ points }) => {
+				for (i = 0; i < points.length; i++) {
+					this.plot.segments[i + 1].point.x = points[i].x
+					this.plot.segments[i + 1].point.y = points[i].y
+					this.labels[i].position.y = points[i].y
+					this.labels[i].content = Math.round(points[i].content) + '°'
+				}
+				this.plot.smooth({ from: 2 })
+			})
+			.on('complete', () => this.prev = next)
+			.start()
+	}
 }
 
 export default Chart

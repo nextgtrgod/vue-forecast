@@ -108,9 +108,9 @@ export default {
 		},
 
 		search() {
-			let place = this.autocomplete.getPlace()
+			let place = this.autocomplete.getPlace() || {}
 
-			if (!place) return
+			if (!place.geometry) return
 
 			let latitude = place.geometry.location.lat()
 			let longitude = place.geometry.location.lng()

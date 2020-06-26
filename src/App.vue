@@ -21,7 +21,7 @@ en:
 			:title="$t('units')"
 		/>
 		<search/>
-		<transition-group name="fade" class="widget-wrap">
+		<transition-group name="fade" tag="div" class="widget-wrap">
 			<widget v-if="forecast" key="widget"/>
 		</transition-group>
 	</div>
@@ -76,6 +76,7 @@ export default {
 
 :root {
 	--width: #{$app-width};
+	--height: #{$app-height};
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -140,7 +141,7 @@ body {
 @include transition(fade, .4s);
 
 .widget-wrap {
-	min-height: 385px;
+	min-height: var(--height);
 }
 
 
@@ -209,7 +210,6 @@ body {
 
 .pac-item-query + span {
 	font-size: .65em;
-	transition: opacity .1;
 	opacity: .5;
 }
 

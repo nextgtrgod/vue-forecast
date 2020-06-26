@@ -5,6 +5,10 @@ import store from './store'
 
 Vue.config.productionTip = false
 
+Vue.directive('visible', (node, binding) => {
+	node.style.visibility = !!binding.value ? 'visible' : 'hidden'
+})
+
 new Vue({
 	i18n,
 	store,

@@ -15,7 +15,7 @@ ru:
 <li class="forecast">
 	<h3>
 		<span>{{ $d(date, 'weekday') }}</span>
-		<icon v-if="weather_id" :id="weather_id"/>
+		<icon v-if="weather_id" :id="weather_id" class="icon"/>
 	</h3>
 	<h4>{{ $d(date, 'date') }}</h4>
 	<ul class="daytimes">
@@ -86,6 +86,11 @@ h3 {
 		position: relative;
 		top: 6px;
 	}
+}
+
+.icon {
+	width: 50px;
+	height: 50px;
 }
 
 h4 {

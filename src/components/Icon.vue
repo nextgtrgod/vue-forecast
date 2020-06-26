@@ -1,7 +1,9 @@
 <template>
 <div class="icon">
-	<img v-if="animation" :src="icon" alt="">
-	<i v-else :class="icon" aria-hidden=""/>
+	<transition name="slide">
+		<img v-if="animation" :src="icon" :key="icon" alt="">
+		<i v-else :class="icon" aria-hidden=""/>
+	</transition>
 </div>
 </template>
 
@@ -42,8 +44,32 @@ export default {
 
 
 <style lang="scss" scoped>
+@import '@/styles/mixins';
+
+.slide-enter-active,
+.slide-leave-active {
+	transition-property: transform, opacity;
+	transition-timing-function: ease-in-out;
+}
+.slide-enter-active,
+.slide-leave-active {
+	transition-duration: .5s;
+}
+.slide-enter {
+	transform: translateY(100%);
+}
+.slide-leave-to {
+	transform: translateY(-100%);
+}
+
+.slide-enter,
+.slide-leave-to {
+	opacity: 0;
+}
 
 .icon {
+	position: relative;
+	width: 100%;
 	height: 100%;
 	display: flex;
 	align-items: center;
@@ -57,6 +83,9 @@ i {
 }
 
 img {
+	position: absolute;
+	top: 0;
+	right: 0;
 	height: 100%;
 	transform: translateZ(0);
 }

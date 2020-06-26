@@ -10,7 +10,6 @@
 				:weather_id="day.weather_id"
 				:key="i"
 			/>
-			<forecast :date="lastDate" />
 		</ul>
 
 		<canvas ref="canvas"/>
@@ -29,46 +28,31 @@ import loadFont from '@/utils/loadFont'
 
 import Chart from '@/modules/Chart'
 
-
 export default {
 	name: 'Widget',
 	components: {
 		Weather,
 		Forecast,
 	},
-	data: () => ({
-		progress: 0,
-	}),
 	mounted() {
-		this.init()
+		let font = 'jura'
+		let rootStyle = getComputedStyle(document.documentElement)
 
-		let scrollArea = this.$refs['scroll-area']
-		scrollArea.addEventListener('scroll', e => {
+		loadFont(`1em ${font}`).then(() => {
 
-			this.progress = scrollArea.scrollLeft / (scrollArea.scrollWidth - scrollArea.clientWidth)
-		})
-	},
-	methods: {
-		init() {
-			let font = 'jura'
-			let rootStyle = getComputedStyle(document.documentElement)
-
-			loadFont(`1em ${font}`).then(() => {
-
-				this.chart = new Chart({
-					canvas: this.$refs['canvas'],
-					font: {
-						family: font,
-						size: 16,
-						size_accent: 28,
-						color: rootStyle.getPropertyValue('--color-text'),
-					},
-					bgColor: 	rootStyle.getPropertyValue('--color-bg'),
-					fillColor: 	rootStyle.getPropertyValue('--color-chart'),
-				})
-				this.chart.update(this.values)
+			this.chart = new Chart({
+				canvas: this.$refs['canvas'],
+				font: {
+					family: font,
+					size: 16,
+					size_accent: 28,
+					color: rootStyle.getPropertyValue('--color-text'),
+				},
+				bgColor: 	rootStyle.getPropertyValue('--color-bg'),
+				fillColor: 	rootStyle.getPropertyValue('--color-chart'),
 			})
-		},
+			this.chart.update(this.values)
+		})
 	},
 	computed: {
 		...mapState({
@@ -86,10 +70,6 @@ export default {
 
 		values() {
 			return this.days.map(day => day.temp)
-		},
-
-		lastDate() {
-			return this.days[this.days.length - 1].date + 86400000
 		},
 	},
 	watch: {
@@ -115,9 +95,9 @@ export default {
 
 #widget {
 	position: relative;
-	height: 385px;
+	height: var(--height);
 	color: var(--color-text);
-	background: linear-gradient(to bottom, var(--color-bg) 290px, var(--color-chart) 291px);
+	background: linear-gradient(to bottom, var(--color-bg) 275px, var(--color-chart) 276px);
 	overflow: hidden;
 	-webkit-mask-image: -webkit-radial-gradient(white, black);
 	user-select: none;
