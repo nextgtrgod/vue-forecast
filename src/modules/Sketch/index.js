@@ -52,7 +52,7 @@ class Sketch {
 	}
 
 	update(...args) {
-		// this.radId = requestAnimationFrame(() => this.update(...args))
+		this.radId = requestAnimationFrame(() => this.update(...args))
 
 		draw(...args)
 	}

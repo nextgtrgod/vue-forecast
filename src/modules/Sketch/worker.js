@@ -21,7 +21,7 @@ onmessage = e => {
 }
 
 self.update = (...args) => {
-	// self.radId = requestAnimationFrame(() => update(...args))
+	self.radId = requestAnimationFrame(() => update(...args))
 
 	draw(...args)
 }

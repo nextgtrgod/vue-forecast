@@ -1,5 +1,5 @@
 # [vue-forecast](https://nextgtrgod.github.io/vue-forecast/)
-### Weather forecast widget on vue.js
+## Weather forecast widget on vue.js
 
 * [Vue.js](https://vuejs.org/)
 * [Google Places API](https://developers.google.com/places/)
@@ -7,12 +7,11 @@
 * [Paper.js](http://paperjs.org/)
 * [Weather Icons](https://github.com/erikflowers/weather-icons)
 
-![vue-forecast app screenshot](https://i.imgur.com/bU4YoQM.jpg)
+<a href="https://nextgtrgod.github.io/vue-forecast/">
+	<img src="https://i.imgur.com/p0ADrEQ.jpg">
+</a>
 
-[Demo](https://nextgtrgod.github.io/vue-forecast/)
-
-
-### Todo
+## Todo
 - [x] google places autocomplete on search
 - [x] forecast chart
 - [x] language autodetect
