@@ -91,6 +91,7 @@ h3 {
 .icon {
 	width: 50px;
 	height: 50px;
+	font-size: 32px;
 }
 
 h4 {

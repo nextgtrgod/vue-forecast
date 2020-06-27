@@ -2,7 +2,7 @@
 <div class="icon">
 	<transition name="slide">
 		<img v-if="animation" :src="icon" :key="icon" alt="">
-		<i v-else :class="icon" aria-hidden=""/>
+		<i v-else :class="icon" aria-hidden="" :key="icon"/>
 	</transition>
 </div>
 </template>
@@ -73,19 +73,23 @@ export default {
 	height: 100%;
 	display: flex;
 	align-items: center;
-	text-align: right;
+	justify-content: center;
 	backface-visibility: hidden;
 }
 
 i {
-	padding-right: 10px;
-	font-size: 85px;
+	height: 1em;
 }
 
-img {
+img, i {
 	position: absolute;
 	top: 0;
 	right: 0;
+	bottom: 0;
+	margin: auto;
+}
+
+img {
 	height: 100%;
 	transform: translateZ(0);
 }

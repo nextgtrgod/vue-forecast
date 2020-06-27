@@ -4,44 +4,38 @@ import { Tween, autoPlay } from 'es6-tween'
 autoPlay(true)
 
 let appWidth = 0
-let days = 8
-let W = appWidth * days
+let W = 0
 let H = 100
 
 class Chart {
 	constructor({ canvas, font, bgColor, fillColor }) {
-
-		paper.setup(canvas)
-
-		appWidth = Math.min(520, window.innerWidth)
-		paper.view.viewSize.width = W
-		paper.view.viewSize.height = H
-
-		window.addEventListener('resize', () => this.setSize())
-
 		this.font = font
 		this.bgColor = bgColor
 		this.fillColor = fillColor
 
-		this.init()
+		paper.setup(canvas)
+
+		this.setSize()
+		window.addEventListener('resize', () => this.setSize())
 	}
 
 	setSize() {
 		appWidth = Math.min(520, window.innerWidth)
 
-		// this.update(this.data)
+		W = appWidth * 8
+		paper.view.viewSize.width = W
+		paper.view.viewSize.height = H
+
+		this.init()
 	}
 
 	init() {
-		W = appWidth * days
-		paper.view.viewSize.width = W
-
 		if (this.plot) this.plot.remove()
 		if (this.labels) this.labels.forEach(label => label.remove())
 
-		let data = new Array(8).fill( new Array(4).fill(-99) )
+		if (!this.data) this.data = new Array(8).fill( new Array(4).fill(-99) )
 
-		let points = this.convert(data)
+		let points = this.convert(this.data)
 
 		this.plot = new paper.Path({
 			segments: [
@@ -69,11 +63,6 @@ class Chart {
 
 			if (i % 4 === 0) offset = 12
 
-			// if ((i + 3) % 4 === 0) {
-			// 	label.fontSize = this.font.size_accent
-			// 	offset = -2
-			// }
-
 			label.position = new paper.Point(points[i].x + offset, points[i].y)
 
 			this.labels.push(label)
@@ -83,17 +72,17 @@ class Chart {
 	}
 
 	update(data) {
-		let next = this.convert(data)
+		if (data.length !== this.data.length) {
+			this.data = data
+			this.init()
+			return
+		}
+
+		this.data = data
+
+		let next = this.convert(this.data)
 
 		this.animate(next, this.prev)
-
-		// this.data = data
-
-		// let points = this.convert(this.data)
-
-		// W = points[points.length - 1].x
-
-		// paper.view.viewSize.width = W
 	}
 
 	convert(data) {

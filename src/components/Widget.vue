@@ -45,7 +45,6 @@ export default {
 				font: {
 					family: font,
 					size: 16,
-					size_accent: 28,
 					color: rootStyle.getPropertyValue('--color-text'),
 				},
 				bgColor: 	rootStyle.getPropertyValue('--color-bg'),

@@ -7,9 +7,9 @@
 * [Paper.js](http://paperjs.org/)
 * [Weather Icons](https://github.com/erikflowers/weather-icons)
 
-![vue-forecast app screenshot](https://i.imgur.com/U51swln.jpg)
+![vue-forecast app screenshot](https://i.imgur.com/bU4YoQM.jpg)
 
-[DEMO](https://nextgtrgod.github.io/vue-forecast/)
+[Demo](https://nextgtrgod.github.io/vue-forecast/)
 
 
 ### Todo

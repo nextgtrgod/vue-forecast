@@ -110,7 +110,7 @@ export default {
 		temp() {
 			let current = convert.temp(this.current.temp)
 
-			makeFavicon(`${current}°`, 'bold 128px jura')
+			makeFavicon(`${current}°`, 'bold 100px jura')
 
 			return {
 				current,
@@ -211,6 +211,12 @@ h2 {
 
 .icon {
 	height: 150px;
+	font-size: 85px;
+	justify-content: flex-end;
+
+	::v-deep i {
+		padding-right: 10px;
+	}
 }
 
 .temp {
