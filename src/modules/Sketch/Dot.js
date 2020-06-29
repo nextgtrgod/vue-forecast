@@ -24,7 +24,7 @@ class Dot {
 		this.updateBounds()
 	}
 
-	checkCollision(W, H) {
+	checkOffscreen(W, H) {
 		if (this.bounds.left <= 0 && this.v.x <= 0) this.v.x *= -1
 		else if (this.bounds.right >= W && this.v.x >= 0) this.v.x *= -1
 
@@ -39,14 +39,31 @@ class Dot {
 		this.bounds.left = this.x - this.r
 	}
 
-	link(dots, threshold) {
+	checkDots(dots, threshold) {
 		for (i = 0; i < dots.length; i++) {
 			if (dots[i].id === this.id) continue
 			if (dots[i].lines[this.id]) continue
 
 			distance = getDistance(this.x, this.y, dots[i].x, dots[i].y)
 
-			if (distance <= threshold && distance >= this.r + dots[i].r)
+			// check collisions with other dots
+			if (distance <= this.r + dots[i].r) {
+				let v = [
+					{ x: this.v.x, y: this.v.y },
+					{ x: dots[i].v.x, y: dots[i].v.y }
+				]
+
+				this.v.x = v[1].x
+				this.v.y = v[1].y
+
+				dots[i].v.x = v[0].x
+				dots[i].v.y = v[0].y
+
+				continue
+			}
+
+			// add lines between dots
+			if (distance <= threshold)
 				this.lines[dots[i].id] = {
 					0: { x: this.x, y: this.y },
 					1: { x: dots[i].x, y: dots[i].y },
@@ -58,13 +75,13 @@ class Dot {
 	}
 
 	update(ctx, W, H, dots, threshold) {
-		this.checkCollision(W, H)
+		this.checkOffscreen(W, H)
 
 		this.x += this.v.x || 0
 		this.y += this.v.y || 0
 
 		this.updateBounds()
-		this.link(dots, threshold)
+		this.checkDots(dots, threshold)
 
 		ctx.beginPath()
 		ctx.fillStyle = this.fill

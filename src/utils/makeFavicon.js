@@ -15,9 +15,9 @@ let makeFavicon = async (text, font) => {
 	ctx.font = font
 
 	ctx.clearRect(0, 0, canvas.width, canvas.height)
-	
+
 	ctx.fillStyle = color
-	
+
 	ctx.fillText(text, canvas.width / 2, canvas.height / 2, canvas.width)
 	
 	let data = canvas.toDataURL('image/png')
