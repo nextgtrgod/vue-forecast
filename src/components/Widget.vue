@@ -52,6 +52,16 @@ export default {
 			})
 			this.chart.update(this.values)
 		})
+
+		window.addEventListener('resize', () => this.scrollBack())
+	},
+	methods: {
+		scrollBack() {
+			this.$refs['scroll-area'].scrollTo({
+				left: 0,
+				behavior: 'smooth',
+			})
+		},
 	},
 	computed: {
 		...mapState({
@@ -77,12 +87,7 @@ export default {
 
 			this.chart.update(values)
 
-			this.$nextTick(() => {
-				this.$refs['scroll-area'].scrollTo({
-					left: 0,
-					behavior: 'smooth',
-				})
-			})
+			this.$nextTick(this.scrollBack)
 		},
 	},
 }
@@ -98,11 +103,11 @@ export default {
 	color: var(--color-text);
 	background: linear-gradient(to bottom, var(--color-bg) 275px, var(--color-chart) 276px);
 	overflow: hidden;
-	-webkit-mask-image: -webkit-radial-gradient(white, black);
 	user-select: none;
 
 	@media (min-width: $app-width) {
 		border-radius: var(--radius);
+		-webkit-mask-image: -webkit-radial-gradient(white, black);
 	}
 }
 

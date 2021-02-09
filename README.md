@@ -7,7 +7,7 @@
 * [Paper.js](http://paperjs.org/)
 * [Weather Icons](https://github.com/erikflowers/weather-icons)
 
-<a href="https://nextgtrgod.github.io/vue-forecast/">
+<a href="https://nextgtrgod.github.io/vue-forecast/" target="_blank">
 	<img src="https://i.imgur.com/p0ADrEQ.jpg">
 </a>
 
